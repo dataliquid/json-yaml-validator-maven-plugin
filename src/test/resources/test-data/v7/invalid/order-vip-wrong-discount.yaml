@@ -1,0 +1,16 @@
+orderId: ORD-99999999
+customer:
+  name: VIP Customer
+  email: vip@example.com
+  discount: 0.1
+items:
+  - productId: PROD-001
+    quantity: 1
+    price: 99.99
+total: 89.99
+status: processing
+shippingAddress:
+  street: 789 Test St
+  city: Boston
+  zipCode: invalid-zip
+  country: US

@@ -1,0 +1,19 @@
+{
+  "apiVersion": "v3.0.0",
+  "endpoints": [
+    {
+      "path": "/api/data",
+      "method": "POST",
+      "security": ["oauth2"]
+    }
+  ],
+  "authentication": {
+    "type": "oauth2",
+    "config": {
+      "authorizationUrl": "not-a-valid-url"
+    }
+  },
+  "rateLimiting": {
+    "enabled": true
+  }
+}

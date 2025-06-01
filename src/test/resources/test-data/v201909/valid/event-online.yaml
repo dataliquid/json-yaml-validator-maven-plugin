@@ -1,0 +1,21 @@
+eventId: f47ac10b-58cc-4372-a567-0e02b2c3d479
+title: Machine Learning Workshop Online
+eventType: workshop
+schedule:
+  startDate: "2024-07-20T14:00:00Z"
+  endDate: "2024-07-20T17:00:00Z"
+  timezone: Europe/London
+attendees:
+  - name: AI Expert
+    email: expert@ml-workshop.com
+    role: speaker
+  - name: Workshop Admin
+    email: admin@ml-workshop.com
+    role: organizer
+location:
+  type: online
+  platform: Zoom
+  url: https://zoom.us/j/123456789
+metadata:
+  tag_topic: machine-learning
+  count_max_attendees: 100

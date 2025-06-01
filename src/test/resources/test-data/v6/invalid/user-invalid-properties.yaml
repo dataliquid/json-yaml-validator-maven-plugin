@@ -1,0 +1,11 @@
+username: valid_user
+email: user@example.com
+age: 150
+roles: 
+  - admin
+  - invalid_role
+profile:
+  bio: This is a bio
+  Website: https://example.com
+  InvalidProperty: should not be here
+extraField: not allowed

@@ -1,0 +1,15 @@
+{
+  "eventId": "not-a-valid-uuid",
+  "title": "Test",
+  "eventType": "meetup",
+  "schedule": {
+    "startDate": "2024-08-01T10:00:00Z",
+    "endDate": "2024-08-01T12:00:00Z"
+  },
+  "attendees": [],
+  "location": {
+    "type": "online",
+    "platform": "Teams",
+    "url": "not-a-url"
+  }
+}

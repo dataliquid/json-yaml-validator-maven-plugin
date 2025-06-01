@@ -1,0 +1,11 @@
+{
+  "id": 12345,
+  "name": "Laptop Computer",
+  "price": 999.99,
+  "tags": ["electronics", "computers", "portable"],
+  "dimensions": {
+    "length": 30.5,
+    "width": 21.5,
+    "height": 2.5
+  }
+}

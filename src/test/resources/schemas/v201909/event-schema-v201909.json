@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://example.com/schemas/event.json",
+  "title": "Event",
+  "description": "An event with complex validation rules",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100
+    },
+    "eventType": {
+      "type": "string",
+      "enum": ["conference", "workshop", "webinar", "meetup"]
+    },
+    "schedule": {
+      "type": "object",
+      "properties": {
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timezone": {
+          "type": "string",
+          "pattern": "^[A-Za-z]+/[A-Za-z_]+$"
+        }
+      },
+      "required": ["startDate", "endDate", "timezone"]
+    },
+    "attendees": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/attendee"
+      },
+      "minItems": 1,
+      "maxItems": 1000,
+      "uniqueItems": true
+    },
+    "location": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "online"},
+            "platform": {"type": "string"},
+            "url": {"type": "string", "format": "uri"}
+          },
+          "required": ["type", "platform", "url"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "physical"},
+            "venue": {"type": "string"},
+            "address": {"$ref": "#/$defs/address"}
+          },
+          "required": ["type", "venue", "address"]
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "patternProperties": {
+        "^tag_": {"type": "string"},
+        "^count_": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["eventId", "title", "eventType", "schedule", "location"],
+  "$defs": {
+    "attendee": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "email": {"type": "string", "format": "email"},
+        "role": {
+          "type": "string",
+          "enum": ["speaker", "organizer", "participant", "sponsor"]
+        }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {"type": "string"},
+        "city": {"type": "string"},
+        "country": {"type": "string", "minLength": 2, "maxLength": 2}
+      },
+      "required": ["city", "country"]
+    }
+  }
+}
