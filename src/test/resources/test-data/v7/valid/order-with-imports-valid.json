@@ -1,0 +1,45 @@
+{
+  "orderId": "ORD-12345678",
+  "orderDate": "2024-01-15T10:30:00Z",
+  "customer": {
+    "customerId": "CUST-123456",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "phone": "+1234567890",
+    "billingAddress": {
+      "street": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "zipCode": "10001",
+      "country": "USA"
+    },
+    "shippingAddress": {
+      "street": "456 Oak Ave",
+      "city": "Brooklyn",
+      "state": "NY",
+      "zipCode": "11201",
+      "country": "USA"
+    }
+  },
+  "items": [
+    {
+      "productId": "PROD-001",
+      "quantity": 2,
+      "price": 29.99
+    },
+    {
+      "productId": "PROD-002",
+      "quantity": 1,
+      "price": 49.99
+    }
+  ],
+  "deliveryAddress": {
+    "street": "456 Oak Ave",
+    "city": "Brooklyn",
+    "state": "NY",
+    "zipCode": "11201",
+    "country": "USA"
+  },
+  "total": 109.97,
+  "status": "pending"
+}

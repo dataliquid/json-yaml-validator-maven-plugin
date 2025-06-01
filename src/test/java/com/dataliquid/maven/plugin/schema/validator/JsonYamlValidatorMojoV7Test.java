@@ -79,4 +79,63 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
         // VIP customer with correct 0.2 discount
         mojo.execute();
     }
+
+    public void testV7ValidOrderWithImports() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v7-imports-valid-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        // Should execute without exception - tests schema importing
+        mojo.execute();
+    }
+
+    public void testV7InvalidOrderWithImportsAddress() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v7-imports-invalid-address-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        try {
+            mojo.execute();
+            fail("Expected MojoFailureException due to invalid address in imported schema");
+        } catch (MojoFailureException e) {
+            // Expected exception - address validation from imported schema should fail
+            assertTrue(e.getMessage().contains("Validation failed"));
+        }
+    }
+
+    public void testV7InvalidOrderWithImportsCustomer() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v7-imports-invalid-customer-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        try {
+            mojo.execute();
+            fail("Expected MojoFailureException due to invalid customer in imported schema");
+        } catch (MojoFailureException e) {
+            // Expected exception - customer validation from imported schema should fail
+            assertTrue(e.getMessage().contains("Validation failed"));
+        }
+    }
+
+    public void testV7SchemaImportWithMapping() throws Exception {
+        // Test schema imports with custom mappings
+        File pom = getTestFile("target/test-classes/test-poms/v7-imports-with-mapping-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        // Should successfully validate data that uses imported schemas
+        mojo.execute();
+    }
 }

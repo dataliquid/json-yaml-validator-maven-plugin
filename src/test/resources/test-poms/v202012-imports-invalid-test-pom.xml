@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.dataliquid.maven</groupId>
+    <artifactId>v202012-imports-invalid-test</artifactId>
+    <version>1.0.0</version>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.dataliquid.maven</groupId>
+                <artifactId>json-yaml-validator-maven-plugin</artifactId>
+                <version>@project.version@</version>
+                <configuration>
+                    <schemaFile>${basedir}/src/test/resources/schemas/v202012/organization.json</schemaFile>
+                    <sourceDirectory>${basedir}/src/test/resources/test-data/v202012/invalid</sourceDirectory>
+                    <includes>
+                        <include>organization-invalid-refs.yaml</include>
+                    </includes>
+                    <schemaVersion>V202012</schemaVersion>
+                    <failOnError>true</failOnError>
+                    <schemaMappings>
+                        <schemaMapping>http://example.com/schemas/=${basedir}/src/test/resources/schemas/v202012/</schemaMapping>
+                    </schemaMappings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
