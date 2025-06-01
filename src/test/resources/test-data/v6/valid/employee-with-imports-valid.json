@@ -1,0 +1,22 @@
+{
+  "employeeId": "EMP-123456",
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "contact": {
+    "email": "alice.johnson@company.com",
+    "phone": "+1234567890",
+    "website": "https://www.alicejohnson.com",
+    "socialMedia": {
+      "twitter": "@alicej",
+      "linkedin": "https://linkedin.com/in/alicejohnson",
+      "github": "alice-johnson"
+    }
+  },
+  "roleInfo": {
+    "role": "manager",
+    "permissions": ["read", "write", "execute"]
+  },
+  "department": "IT",
+  "startDate": "2022-03-15",
+  "active": true
+}

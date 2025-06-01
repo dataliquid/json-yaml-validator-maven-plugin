@@ -92,4 +92,33 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
         // First item in limits array has special constraints
         mojo.execute();
     }
+
+    public void testV202012ValidOrganizationWithImports() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v202012-imports-valid-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        // Should execute without exception - tests schema importing with $defs
+        mojo.execute();
+    }
+
+    public void testV202012InvalidOrganizationWithImports() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v202012-imports-invalid-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        try {
+            mojo.execute();
+            fail("Expected MojoFailureException due to invalid data against imported schema definitions");
+        } catch (MojoFailureException e) {
+            // Expected exception - validation from imported schema definitions should fail
+            assertTrue(e.getMessage().contains("Validation failed"));
+        }
+    }
 }

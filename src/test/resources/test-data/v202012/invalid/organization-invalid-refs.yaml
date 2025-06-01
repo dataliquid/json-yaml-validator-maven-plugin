@@ -1,0 +1,14 @@
+organizationId: ORG-INVALID
+name: Bad Organization
+contactEmail: not-an-email-address
+contactPhone: "123"
+headquarters:
+  street: 100 Test St
+  city: TestCity
+  state: TOOLONG
+  postalCode: "INVALID"
+  country: US
+branches:
+  - street: ""
+    city: ""
+    postalCode: "12345"

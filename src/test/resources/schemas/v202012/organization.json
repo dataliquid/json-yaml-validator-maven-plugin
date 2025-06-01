@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/schemas/organization.json",
+  "title": "Organization",
+  "description": "An organization with imported types",
+  "type": "object",
+  "properties": {
+    "organizationId": {
+      "type": "string",
+      "pattern": "^ORG-[0-9]{6}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contactEmail": {
+      "$ref": "http://example.com/schemas/base-types.json#/$defs/email"
+    },
+    "contactPhone": {
+      "$ref": "http://example.com/schemas/base-types.json#/$defs/phoneNumber"
+    },
+    "headquarters": {
+      "$ref": "http://example.com/schemas/base-types.json#/$defs/address"
+    },
+    "branches": {
+      "type": "array",
+      "items": {
+        "$ref": "http://example.com/schemas/base-types.json#/$defs/address"
+      }
+    }
+  },
+  "required": ["organizationId", "name", "contactEmail", "headquarters"]
+}

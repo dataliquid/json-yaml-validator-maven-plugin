@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.dataliquid.maven</groupId>
+    <artifactId>v6-imports-invalid-contact-test</artifactId>
+    <version>1.0.0</version>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.dataliquid.maven</groupId>
+                <artifactId>json-yaml-validator-maven-plugin</artifactId>
+                <version>@project.version@</version>
+                <configuration>
+                    <schemaFile>${basedir}/src/test/resources/schemas/v6/employee-with-imports.json</schemaFile>
+                    <sourceDirectory>${basedir}/src/test/resources/test-data/v6/invalid</sourceDirectory>
+                    <includes>
+                        <include>employee-with-imports-invalid-contact.json</include>
+                    </includes>
+                    <schemaVersion>V6</schemaVersion>
+                    <failOnError>true</failOnError>
+                    <schemaMappings>
+                        <schemaMapping>http://example.com/schemas/v6/=${basedir}/src/test/resources/schemas/v6/</schemaMapping>
+                    </schemaMappings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

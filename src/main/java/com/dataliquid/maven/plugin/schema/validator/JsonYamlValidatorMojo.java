@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,6 +51,9 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     @Parameter(property = "schema.validator.skip", defaultValue = "false")
     private boolean skip;
 
+    @Parameter(property = "schema.validator.schemaMappings")
+    private String[] schemaMappings;
+
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
@@ -85,8 +90,78 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         JsonNode schemaNode = readFile(schemaFile);
         SpecVersion.VersionFlag version = getSchemaVersion();
         
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(version);
-        return factory.getSchema(schemaNode);
+        JsonSchemaFactory factory;
+        
+        // If schema mappings are configured, create factory with custom schema mappers
+        if (schemaMappings != null && schemaMappings.length > 0) {
+            // Collect prefix mappings and direct mappings separately
+            Map<String, String> directMappings = new HashMap<>();
+            
+            factory = JsonSchemaFactory.getInstance(version, builder -> 
+                builder.schemaMappers(schemaMappers -> {
+                    // Add mappings from configuration
+                    for (String mapping : schemaMappings) {
+                        String[] parts = mapping.split("=", 2);
+                        if (parts.length == 2) {
+                            String schemaId = parts[0].trim();
+                            String localPath = parts[1].trim();
+                            
+                            // Convert local file path to proper URI
+                            String mappedUri;
+                            if (localPath.startsWith("classpath:") || localPath.startsWith("http://") || 
+                                localPath.startsWith("https://") || localPath.startsWith("file:")) {
+                                // Already a proper URI scheme
+                                mappedUri = localPath;
+                            } else {
+                                // Convert file path to proper file URI
+                                File localFile = new File(localPath);
+                                if (!localFile.isAbsolute()) {
+                                    // Make relative paths relative to schema directory
+                                    localFile = new File(schemaFile.getParentFile(), localPath);
+                                }
+                                mappedUri = localFile.toURI().toString();
+                            }
+                            
+                            // Check if this is a prefix mapping (ends with /) or a direct mapping
+                            if (schemaId.endsWith("/") && localPath.endsWith("/")) {
+                                // This is a prefix mapping for a directory
+                                getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
+                                schemaMappers.mapPrefix(schemaId, mappedUri);
+                            } else if (schemaId.endsWith("/") && !localPath.endsWith("/")) {
+                                // Schema ID is a prefix but local path is a directory - ensure it ends with /
+                                File dir = new File(localPath);
+                                if (!dir.isAbsolute()) {
+                                    dir = new File(schemaFile.getParentFile(), localPath);
+                                }
+                                if (dir.isDirectory()) {
+                                    mappedUri = dir.toURI().toString();
+                                    getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
+                                    schemaMappers.mapPrefix(schemaId, mappedUri);
+                                } else {
+                                    getLog().warn("Schema prefix mapping points to non-directory: " + localPath);
+                                }
+                            } else {
+                                // This is a direct schema mapping - add to map
+                                getLog().info("Adding direct schema mapping: " + schemaId + " -> " + mappedUri);
+                                directMappings.put(schemaId, mappedUri);
+                            }
+                        } else {
+                            getLog().warn("Invalid schema mapping format: " + mapping + " (expected: schemaId=path)");
+                        }
+                    }
+                    
+                    // Apply all direct mappings at once
+                    if (!directMappings.isEmpty()) {
+                        schemaMappers.mappings(directMappings);
+                    }
+                })
+            );
+        } else {
+            factory = JsonSchemaFactory.getInstance(version);
+        }
+        
+        // Set the schema URI to enable proper resolution of relative $ref imports
+        return factory.getSchema(schemaFile.toURI(), schemaNode);
     }
 
     private SpecVersion.VersionFlag getSchemaVersion() throws MojoExecutionException {

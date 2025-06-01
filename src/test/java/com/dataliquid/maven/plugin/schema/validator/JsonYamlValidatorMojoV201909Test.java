@@ -92,4 +92,50 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
         // Has startDate with timezone
         mojo.execute();
     }
+
+    public void testV201909ValidEventWithImports() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v201909-imports-valid-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        // Should execute without exception - tests schema importing
+        mojo.execute();
+    }
+
+    public void testV201909InvalidEventWithImportsLocation() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v201909-imports-invalid-location-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        try {
+            mojo.execute();
+            fail("Expected MojoFailureException due to invalid location data");
+        } catch (MojoFailureException e) {
+            // Expected exception
+            assertTrue(e.getMessage().contains("Validation failed"));
+        }
+    }
+
+    public void testV201909InvalidEventWithImportsVenue() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v201909-imports-invalid-venue-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        try {
+            mojo.execute();
+            fail("Expected MojoFailureException due to invalid venue and other errors");
+        } catch (MojoFailureException e) {
+            // Expected exception
+            assertTrue(e.getMessage().contains("Validation failed"));
+        }
+    }
 }

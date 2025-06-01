@@ -1,0 +1,22 @@
+productId: PROD-789012
+name: Wireless Mouse
+price:
+  amount: 29.99
+  currency: EUR
+dimensions:
+  length: 12
+  width: 6.5
+  height: 3.8
+  unit: cm
+supplier:
+  supplierId: SUP-67890
+  name: Peripherals Plus
+  contact:
+    email: info@peripheralsplus.com
+    phone: "+442012345678"
+  rating: 4.2
+inStock: true
+tags:
+  - mouse
+  - wireless
+  - ergonomic

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://example.com/schemas/v201909/event-with-imports.json",
+  "title": "Event with Imports",
+  "description": "Event that imports location and venue schemas",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "pattern": "^EVT-[0-9]{8}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "location": {
+      "$ref": "location.json"
+    },
+    "venue": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "venue-definitions.json#/$defs/venueType"
+        },
+        "capacity": {
+          "$ref": "venue-definitions.json#/$defs/capacity"
+        },
+        "amenities": {
+          "$ref": "venue-definitions.json#/$defs/amenities"
+        },
+        "address": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "type", "capacity"]
+    },
+    "schedule": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timezone": {
+          "type": "string",
+          "pattern": "^[A-Za-z]+/[A-Za-z_]+$"
+        }
+      },
+      "required": ["start", "end", "timezone"]
+    },
+    "registration": {
+      "type": "object",
+      "properties": {
+        "required": { "type": "boolean" },
+        "url": { "type": "string", "format": "uri" },
+        "deadline": { "type": "string", "format": "date-time" }
+      },
+      "if": {
+        "properties": { "required": { "const": true } }
+      },
+      "then": {
+        "required": ["url", "deadline"]
+      }
+    }
+  },
+  "required": ["eventId", "title", "location", "venue", "schedule"],
+  "additionalProperties": false
+}

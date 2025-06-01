@@ -1,0 +1,17 @@
+employeeId: WRONG-ID
+firstName: ""
+lastName: X
+contact:
+  # missing required email
+  phone: "+1234567890"
+roleInfo:
+  role: superuser  # invalid role
+  permissions:
+    - read
+    - write
+    - destroy  # invalid permission
+    - read  # duplicate
+department: Engineering  # invalid department
+startDate: 2023-13-45  # invalid date
+active: "yes"  # should be boolean
+extraField: "not allowed"  # additional property

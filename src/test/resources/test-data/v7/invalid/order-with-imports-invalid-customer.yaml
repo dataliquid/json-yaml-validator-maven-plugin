@@ -1,0 +1,24 @@
+orderId: ORD-98765432
+orderDate: "2024-01-16T14:45:00Z"
+customer:
+  customerId: INVALID-ID
+  name: ""
+  email: not-an-email
+  billingAddress:
+    street: 789 Elm Street
+    city: Los Angeles
+    state: CA
+    zipCode: "90001"
+    country: USA
+items:
+  - productId: PROD-003
+    quantity: 3
+    price: 19.99
+deliveryAddress:
+  street: 789 Elm Street
+  city: Los Angeles
+  state: CA
+  zipCode: "90001"
+  country: USA
+total: 59.97
+status: processing
