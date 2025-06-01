@@ -23,7 +23,7 @@ Add the plugin to your project's `pom.xml`:
 <build>
     <plugins>
         <plugin>
-            <groupId>com.example</groupId>
+            <groupId>com.dataliquid.maven</groupId>
             <artifactId>json-yaml-validator-maven-plugin</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <executions>
@@ -113,14 +113,14 @@ Here's a complete example POM file showing how to configure the plugin:
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
+    <groupId>com.dataliquid.maven</groupId>
     <artifactId>example-project</artifactId>
     <version>1.0.0</version>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>com.example</groupId>
+                <groupId>com.dataliquid.maven</groupId>
                 <artifactId>json-yaml-validator-maven-plugin</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
                 <executions>

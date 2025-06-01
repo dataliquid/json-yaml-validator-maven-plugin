@@ -28,22 +28,22 @@ import com.networknt.schema.ValidationMessage;
 @Mojo(name = "validate", defaultPhase = LifecyclePhase.VALIDATE)
 public class JsonYamlValidatorMojo extends AbstractMojo {
 
-    @Parameter(property = "validator.schemaFile", required = true)
+    @Parameter(property = "schema.validator.schemaFile", required = true)
     private File schemaFile;
 
-    @Parameter(property = "validator.sourceDirectory", defaultValue = "${project.basedir}/src/main/resources")
+    @Parameter(property = "schema.validator.sourceDirectory", defaultValue = "${project.basedir}/src/main/resources")
     private File sourceDirectory;
 
-    @Parameter(property = "validator.includes", defaultValue = "**/*.json,**/*.yaml,**/*.yml")
+    @Parameter(property = "schema.validator.includes", defaultValue = "**/*.json,**/*.yaml,**/*.yml")
     private String[] includes;
 
-    @Parameter(property = "validator.excludes")
+    @Parameter(property = "schema.validator.excludes")
     private String[] excludes;
 
-    @Parameter(property = "validator.failOnError", defaultValue = "true")
+    @Parameter(property = "schema.validator.failOnError", defaultValue = "true")
     private boolean failOnError;
 
-    @Parameter(property = "validator.schemaVersion", defaultValue = "V202012")
+    @Parameter(property = "schema.validator.schemaVersion", defaultValue = "V202012")
     private String schemaVersion;
 
     @Parameter(property = "schema.validator.skip", defaultValue = "false")
