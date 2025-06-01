@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "http://example.com/schemas/base-types.json",
+  "title": "Base Types",
+  "description": "Common type definitions",
+  "$defs": {
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "pattern": "^\\+?[1-9]\\d{1,14}$"
+    },
+    "postalCode": {
+      "type": "string",
+      "pattern": "^[0-9]{5}(-[0-9]{4})?$"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string",
+          "minLength": 1
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2
+        },
+        "postalCode": {
+          "$ref": "#/$defs/postalCode"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
+        }
+      },
+      "required": ["street", "city", "country"]
+    }
+  }
+}
