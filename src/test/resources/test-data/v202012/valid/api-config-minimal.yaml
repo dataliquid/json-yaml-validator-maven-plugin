@@ -1,0 +1,9 @@
+apiVersion: v1.0.0
+endpoints:
+  - path: /api/status
+    method: GET
+authentication:
+  type: apiKey
+  config:
+    headerName: X-API-Key
+    prefix: Bearer

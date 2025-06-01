@@ -1,0 +1,15 @@
+orderId: ORD-87654321
+customer:
+  name: VIP Customer
+  email: vip@example.com
+  discount: 0.2
+items:
+  - productId: PROD-PREMIUM
+    quantity: 5
+    price: 199.99
+total: 799.96
+status: pending
+shippingAddress:
+  street: 456 VIP Lane
+  city: New York
+  country: USA

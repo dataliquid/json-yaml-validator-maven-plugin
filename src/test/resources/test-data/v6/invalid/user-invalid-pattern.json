@@ -1,0 +1,6 @@
+{
+  "username": "jo",
+  "email": "invalid-email",
+  "age": 25,
+  "roles": ["admin"]
+}

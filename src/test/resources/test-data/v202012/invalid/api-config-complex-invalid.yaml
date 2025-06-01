@@ -1,0 +1,27 @@
+apiVersion: invalid-version
+endpoints:
+  - path: api/missing-slash
+    method: INVALID
+  - path: /api/test
+    method: GET
+    extraProperty: not allowed
+authentication:
+  type: unknown
+  config: {}
+rateLimiting:
+  enabled: true
+  limits:
+    - path: /api/health
+      method: GET
+      maxRequests: 500
+      windowSeconds: 60
+    - path: /api/data
+      method: POST
+      maxRequests: 0
+      windowSeconds: -1
+cors:
+  allowedOrigins: 
+    - not-a-uri
+  allowedMethods: []
+  maxAge: -100
+  unexpectedProperty: should fail

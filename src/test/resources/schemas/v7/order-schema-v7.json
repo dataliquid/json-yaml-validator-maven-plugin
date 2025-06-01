@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/order.json",
+  "title": "Order",
+  "description": "A customer order",
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "pattern": "^ORD-[0-9]{8}$"
+    },
+    "customer": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "email": {"type": "string", "format": "email"},
+        "phone": {"type": "string", "pattern": "^\\+?[1-9]\\d{1,14}$"}
+      },
+      "required": ["name", "email"],
+      "if": {
+        "properties": {"name": {"const": "VIP Customer"}}
+      },
+      "then": {
+        "properties": {"discount": {"type": "number", "const": 0.2}}
+      },
+      "else": {
+        "properties": {"discount": {"type": "number", "const": 0.0}}
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "productId": {"type": "string"},
+          "quantity": {"type": "integer", "minimum": 1},
+          "price": {"type": "number", "minimum": 0}
+        },
+        "required": ["productId", "quantity", "price"]
+      }
+    },
+    "total": {
+      "type": "number",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "processing", "shipped", "delivered", "cancelled"]
+    },
+    "shippingAddress": {
+      "$ref": "#/definitions/address"
+    }
+  },
+  "required": ["orderId", "customer", "items", "total", "status"],
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {"type": "string"},
+        "city": {"type": "string"},
+        "state": {"type": "string"},
+        "zipCode": {"type": "string", "pattern": "^[0-9]{5}(-[0-9]{4})?$"},
+        "country": {"type": "string"}
+      },
+      "required": ["street", "city", "country"]
+    }
+  }
+}

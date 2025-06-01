@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://example.com/schemas/user.json",
+  "title": "User",
+  "description": "A user account",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_]{3,20}$"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 13,
+      "maximum": 120
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["admin", "user", "guest"]
+      },
+      "contains": {
+        "const": "user"
+      }
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "bio": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "propertyNames": {
+        "pattern": "^[a-z]+$"
+      }
+    }
+  },
+  "required": ["username", "email"],
+  "additionalProperties": false
+}

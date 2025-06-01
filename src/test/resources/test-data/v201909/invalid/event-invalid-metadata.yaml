@@ -1,0 +1,21 @@
+eventId: 123e4567-e89b-12d3-a456-426614174000
+title: Invalid Metadata Event Test
+eventType: webinar
+schedule:
+  startDate: "2024-09-01T15:00:00Z"
+  endDate: "2024-09-01T16:00:00Z"
+  timezone: America/Chicago
+attendees:
+  - name: Speaker One
+    email: speaker@example.com
+    role: speaker
+location:
+  type: physical
+  venue: Test Venue
+  address:
+    city: Chicago
+    country: US
+metadata:
+  invalid_key: should not be allowed
+  tag_valid: this is ok
+  count_attendees: -5

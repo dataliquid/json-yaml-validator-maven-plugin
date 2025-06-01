@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/YOUR_USERNAME/json-yaml-validator-maven-plugin/discussions
+    about: Please ask and answer questions here
+  - name: Documentation
+    url: https://github.com/YOUR_USERNAME/json-yaml-validator-maven-plugin/blob/main/README.md
+    about: Check our documentation for usage examples and configuration options
