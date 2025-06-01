@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://example.com/schemas/v201909/venue-definitions.json",
+  "title": "Venue Definitions",
+  "description": "Common venue-related definitions",
+  "$defs": {
+    "venueType": {
+      "type": "string",
+      "enum": ["conference_center", "hotel", "stadium", "theater", "online", "hybrid"]
+    },
+    "capacity": {
+      "type": "object",
+      "properties": {
+        "minimum": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maximum": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "optimal": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["maximum"],
+      "dependentRequired": {
+        "optimal": ["minimum", "maximum"]
+      }
+    },
+    "amenities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["wifi", "parking", "catering", "audio_visual", "accessibility", "streaming"]
+      },
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,0 +1,17 @@
+employeeId: EMP-789012
+firstName: Bob
+lastName: Smith
+contact:
+  email: bob.smith@company.com
+  phone: "+442012345678"
+  socialMedia:
+    twitter: "@bobsmith"
+    github: bob-smith-dev
+roleInfo:
+  role: user
+  permissions:
+    - read
+    - write
+department: Finance
+startDate: "2023-01-10"
+active: true

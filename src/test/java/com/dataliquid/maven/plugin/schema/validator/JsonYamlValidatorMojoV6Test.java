@@ -79,4 +79,50 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
         // The valid user has 'user' role which satisfies the contains constraint
         mojo.execute();
     }
+
+    public void testV6ValidEmployeeWithImports() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v6-imports-valid-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        // Should execute without exception - tests schema importing
+        mojo.execute();
+    }
+
+    public void testV6InvalidEmployeeWithImportsContact() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v6-imports-invalid-contact-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        try {
+            mojo.execute();
+            fail("Expected MojoFailureException due to invalid contact information");
+        } catch (MojoFailureException e) {
+            // Expected exception
+            assertTrue(e.getMessage().contains("Validation failed"));
+        }
+    }
+
+    public void testV6InvalidEmployeeWithImportsRole() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v6-imports-invalid-role-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+        
+        try {
+            mojo.execute();
+            fail("Expected MojoFailureException due to invalid role and other errors");
+        } catch (MojoFailureException e) {
+            // Expected exception
+            assertTrue(e.getMessage().contains("Validation failed"));
+        }
+    }
 }

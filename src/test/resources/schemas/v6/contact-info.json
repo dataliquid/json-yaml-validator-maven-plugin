@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://example.com/schemas/v6/contact-info.json",
+  "title": "Contact Information",
+  "description": "Contact information schema",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string",
+      "pattern": "^\\+?[1-9]\\d{1,14}$"
+    },
+    "website": {
+      "type": "string",
+      "format": "uri"
+    },
+    "socialMedia": {
+      "type": "object",
+      "properties": {
+        "twitter": { "type": "string", "pattern": "^@[a-zA-Z0-9_]{1,15}$" },
+        "linkedin": { "type": "string", "format": "uri" },
+        "github": { "type": "string", "pattern": "^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["email"],
+  "additionalProperties": false
+}

@@ -1,0 +1,21 @@
+eventId: EVT-20240620
+title: Virtual DevOps Summit
+description: Online conference for DevOps professionals
+location:
+  latitude: 0
+  longitude: 0
+  timestamp: "2024-02-01T12:00:00Z"
+venue:
+  name: Virtual Conference Platform
+  type: online
+  capacity:
+    maximum: 10000
+  amenities:
+    - streaming
+    - accessibility
+schedule:
+  start: "2024-06-20T13:00:00Z"
+  end: "2024-06-20T21:00:00Z"
+  timezone: Etc/UTC
+registration:
+  required: false
