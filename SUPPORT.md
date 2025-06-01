@@ -53,7 +53,7 @@ For general questions:
 A: The plugin supports Draft 4, 6, 7, 2019-09, and 2020-12. Default is 2020-12.
 
 ### Q: Can I validate multiple schemas in one build?
-A: Currently, the plugin supports one schema per execution. You can configure multiple executions for multiple schemas.
+A: Yes, you can configure multiple executions with different schema files. Each execution can have its own schema file and source directory.
 
 ### Q: Why is my YAML file not being validated?
 A: Check that:
@@ -65,7 +65,18 @@ A: Check that:
 A: Use multiple executions with different `sourceDirectory` configurations, or use include patterns like `**/data/**/*.json`.
 
 ### Q: Can I use schema references ($ref)?
-A: Yes, the plugin supports JSON Schema references, including external file references.
+A: Yes, the plugin supports JSON Schema references, including external file references. You can use the `schemaMappings` parameter to map external schema URLs to local files.
+
+### Q: How do I handle schemas that reference external URLs?
+A: Use the `schemaMappings` parameter to map external schema URLs to local files:
+```xml
+<schemaMappings>
+    <schemaMapping>http://example.com/schemas/=src/main/resources/schemas/</schemaMapping>
+</schemaMappings>
+```
+
+### Q: What happens if validation fails?
+A: By default (`failOnError=true`), the build will fail. You can set `failOnError` to `false` to continue the build despite validation errors.
 
 ## Response Times
 

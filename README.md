@@ -56,6 +56,7 @@ Add the plugin to your project's `pom.xml`:
 | `failOnError` | Fail build on validation error | `true` | No |
 | `schemaVersion` | JSON Schema version (V4, V6, V7, V201909, V202012) | `V202012` | No |
 | `skip` | Skip validation execution | `false` | No |
+| `schemaMappings` | Map schema IDs to local files/directories for $ref resolution | - | No |
 
 ## File Pattern Matching
 
@@ -92,6 +93,44 @@ Examples:
     </excludes>
     
     <failOnError>true</failOnError>
+    
+    <!-- Optional: Map schema IDs to local files for $ref resolution -->
+    <schemaMappings>
+        <schemaMapping>http://example.com/schemas/=src/main/resources/schemas/</schemaMapping>
+        <schemaMapping>http://example.com/user.json=src/main/resources/schemas/user.json</schemaMapping>
+    </schemaMappings>
+</configuration>
+```
+
+## Schema Mappings
+
+The `schemaMappings` parameter allows you to map schema IDs to local files or directories for resolving `$ref` references in your JSON Schema. This is useful when your schema references external schemas by URL.
+
+### Mapping Types
+
+1. **Directory Mapping**: Map a URL prefix to a local directory
+   ```xml
+   <schemaMapping>http://example.com/schemas/=src/main/resources/schemas/</schemaMapping>
+   ```
+   This maps `http://example.com/schemas/user.json` to `src/main/resources/schemas/user.json`
+
+2. **File Mapping**: Map a specific schema ID to a local file
+   ```xml
+   <schemaMapping>http://example.com/user.json=src/main/resources/schemas/user.json</schemaMapping>
+   ```
+
+### Example with Schema Mappings
+
+```xml
+<configuration>
+    <schemaFile>src/main/resources/schemas/main-schema.json</schemaFile>
+    <sourceDirectory>src/main/resources/data</sourceDirectory>
+    <schemaMappings>
+        <!-- Map a URL prefix to a local directory -->
+        <schemaMapping>http://example.com/schemas/=src/main/resources/schemas/</schemaMapping>
+        <!-- Map specific schema IDs to local files -->
+        <schemaMapping>http://example.com/common.json=src/main/resources/schemas/common-definitions.json</schemaMapping>
+    </schemaMappings>
 </configuration>
 ```
 
@@ -156,6 +195,11 @@ Here's a complete example POM file showing how to configure the plugin:
                             <!-- JSON Schema version (default: V202012) -->
                             <!-- Options: V4, V6, V7, V201909, V202012 -->
                             <schemaVersion>V202012</schemaVersion>
+                            
+                            <!-- Optional: Map schema IDs to local files for $ref resolution -->
+                            <schemaMappings>
+                                <schemaMapping>http://example.com/schemas/=src/main/resources/schemas/</schemaMapping>
+                            </schemaMappings>
                         </configuration>
                     </execution>
                 </executions>

@@ -15,7 +15,7 @@ Thank you for your interest in contributing to the JSON/YAML Validator Maven Plu
 
 ## Code of Conduct
 
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a welcoming environment for all contributors.
+We are committed to providing a welcoming and inspiring community for all. Please be respectful and constructive in your interactions with other contributors.
 
 ## Getting Started
 
@@ -80,7 +80,7 @@ docs: update README with new configuration options
 1. Ensure all tests pass: `mvn test`
 2. Update documentation if needed
 3. Add tests for new functionality
-4. Update CHANGELOG.md with your changes
+4. Update CHANGELOG.md with your changes (if applicable)
 5. Create a pull request with a clear description
 
 ### Pull Request Template
@@ -94,7 +94,7 @@ When creating a PR, please include:
 - **Checklist**:
   - [ ] Tests pass
   - [ ] Documentation updated
-  - [ ] CHANGELOG.md updated
+  - [ ] CHANGELOG.md updated (if applicable)
   - [ ] Code follows project style
 
 ## Coding Standards
