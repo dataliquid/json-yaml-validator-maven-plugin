@@ -57,6 +57,7 @@ Add the plugin to your project's `pom.xml`:
 | `schemaVersion` | JSON Schema version (V4, V6, V7, V201909, V202012) | `V202012` | No |
 | `skip` | Skip validation execution | `false` | No |
 | `schemaMappings` | Map schema IDs to local files/directories for $ref resolution | - | No |
+| `failOnNoFilesFound` | Fail build when no files match the include patterns | `true` | No |
 
 ## File Pattern Matching
 
@@ -200,6 +201,9 @@ Here's a complete example POM file showing how to configure the plugin:
                             <schemaMappings>
                                 <schemaMapping>http://example.com/schemas/=src/main/resources/schemas/</schemaMapping>
                             </schemaMappings>
+                            
+                            <!-- Fail when no files found (default: true) -->
+                            <failOnNoFilesFound>true</failOnNoFilesFound>
                         </configuration>
                     </execution>
                 </executions>
@@ -237,3 +241,20 @@ mvn validate -Dschema.validator.skip=true
     <!-- other configuration -->
 </configuration>
 ```
+
+### Controlling Behavior When No Files Are Found
+
+By default, the plugin will fail the build if no files match the include patterns. This helps catch configuration errors early. You can control this behavior with the `failOnNoFilesFound` parameter:
+
+```xml
+<configuration>
+    <!-- Set to false to allow validation to pass when no files are found -->
+    <failOnNoFilesFound>false</failOnNoFilesFound>
+    <!-- other configuration -->
+</configuration>
+```
+
+This is useful in scenarios where:
+- Files might not exist in certain environments
+- You're using the plugin in a multi-module project where some modules might not have files to validate
+- You want validation to be optional based on file availability

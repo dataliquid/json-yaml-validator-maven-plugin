@@ -1,0 +1,20 @@
+<project>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.dataliquid</groupId>
+                <artifactId>json-yaml-validator-maven-plugin</artifactId>
+                <configuration>
+                    <schemaFile>target/test-classes/schemas/v4/product-schema-v4.json</schemaFile>
+                    <sourceDirectory>target/test-classes/test-data/empty-directory</sourceDirectory>
+                    <includes>
+                        <include>**/*.json</include>
+                        <include>**/*.yaml</include>
+                    </includes>
+                    <schemaVersion>V4</schemaVersion>
+                    <failOnNoFilesFound>true</failOnNoFilesFound>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
