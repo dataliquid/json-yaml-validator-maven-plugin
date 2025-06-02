@@ -1,5 +1,7 @@
 # JSON/YAML Validator Maven Plugin
 
+[![CI Build](https://github.com/dataliquid/json-yaml-validator-maven-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/dataliquid/json-yaml-validator-maven-plugin/actions/workflows/ci.yml)
+
 A Maven plugin for validating JSON and YAML files against a JSON Schema using the [networknt/json-schema-validator](https://github.com/networknt/json-schema-validator) library.
 
 ## Requirements
