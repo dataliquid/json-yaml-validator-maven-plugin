@@ -54,6 +54,9 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     @Parameter(property = "schema.validator.schemaMappings")
     private String[] schemaMappings;
 
+    @Parameter(property = "schema.validator.failOnNoFilesFound", defaultValue = "true")
+    private boolean failOnNoFilesFound;
+
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
@@ -181,11 +184,17 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         }
     }
 
-    private List<ValidationResult> validateFiles(JsonSchema schema) throws IOException {
+    private List<ValidationResult> validateFiles(JsonSchema schema) throws IOException, MojoFailureException {
         List<ValidationResult> results = new ArrayList<>();
         List<File> filesToValidate = findFilesToValidate();
         
         getLog().info("Found " + filesToValidate.size() + " files to validate");
+        
+        if (filesToValidate.isEmpty() && failOnNoFilesFound) {
+            getLog().debug("failOnNoFilesFound is true and no files found - throwing exception");
+            throw new MojoFailureException("No files found matching the include patterns. " +
+                "Check your configuration or set failOnNoFilesFound=false to ignore this error.");
+        }
         
         for (File file : filesToValidate) {
             results.add(validateFile(file, schema));
