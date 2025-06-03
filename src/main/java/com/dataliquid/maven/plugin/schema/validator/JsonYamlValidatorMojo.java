@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +13,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import com.dataliquid.maven.plugin.schema.validator.utils.AntPatternFileFilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -209,48 +216,13 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
             return new ArrayList<>();
         }
 
-        try (Stream<Path> paths = Files.walk(sourceDirectory.toPath())) {
-            return paths
-                .filter(Files::isRegularFile)
-                .map(Path::toFile)
-                .filter(this::shouldIncludeFile)
-                .collect(Collectors.toList());
-        }
-    }
-
-    private boolean shouldIncludeFile(File file) {
-        String relativePath = sourceDirectory.toURI().relativize(file.toURI()).getPath();
+        // Create a custom file filter that handles Ant-style patterns
+        IOFileFilter fileFilter = new AntPatternFileFilter(sourceDirectory, includes, excludes);
         
-        boolean included = false;
-        for (String include : includes) {
-            if (matchesPattern(relativePath, include)) {
-                included = true;
-                break;
-            }
-        }
+        // Use Apache Commons IO to find files
+        Collection<File> files = FileUtils.listFiles(sourceDirectory, fileFilter, TrueFileFilter.INSTANCE);
         
-        if (!included) {
-            return false;
-        }
-        
-        if (excludes != null) {
-            for (String exclude : excludes) {
-                if (matchesPattern(relativePath, exclude)) {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
-    }
-
-    private boolean matchesPattern(String path, String pattern) {
-        String regex = pattern
-            .replace(".", "\\.")
-            .replace("**", ".*")
-            .replace("*", "[^/]*")
-            .replace("?", ".");
-        return path.matches(regex);
+        return new ArrayList<>(files);
     }
 
     private ValidationResult validateFile(File file, JsonSchema schema) {
