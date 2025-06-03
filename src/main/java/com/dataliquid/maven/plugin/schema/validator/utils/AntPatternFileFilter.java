@@ -1,4 +1,4 @@
-package com.dataliquid.maven.plugin.schema.validator;
+package com.dataliquid.maven.plugin.schema.validator.utils;
 
 import java.io.File;
 
