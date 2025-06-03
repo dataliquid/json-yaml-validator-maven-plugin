@@ -5,12 +5,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -209,48 +215,114 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
             return new ArrayList<>();
         }
 
-        try (Stream<Path> paths = Files.walk(sourceDirectory.toPath())) {
-            return paths
-                .filter(Files::isRegularFile)
-                .map(Path::toFile)
-                .filter(this::shouldIncludeFile)
-                .collect(Collectors.toList());
-        }
+        // Create a custom file filter that handles Ant-style patterns
+        IOFileFilter fileFilter = new AntPatternFileFilter();
+        
+        // Use Apache Commons IO to find files
+        Collection<File> files = FileUtils.listFiles(sourceDirectory, fileFilter, TrueFileFilter.INSTANCE);
+        
+        return new ArrayList<>(files);
     }
 
-    private boolean shouldIncludeFile(File file) {
-        String relativePath = sourceDirectory.toURI().relativize(file.toURI()).getPath();
+    /**
+     * Custom file filter that handles Ant-style patterns for includes/excludes
+     */
+    private class AntPatternFileFilter implements IOFileFilter {
         
-        boolean included = false;
-        for (String include : includes) {
-            if (matchesPattern(relativePath, include)) {
-                included = true;
-                break;
-            }
-        }
-        
-        if (!included) {
-            return false;
-        }
-        
-        if (excludes != null) {
-            for (String exclude : excludes) {
-                if (matchesPattern(relativePath, exclude)) {
-                    return false;
+        @Override
+        public boolean accept(File file) {
+            String relativePath = sourceDirectory.toURI().relativize(file.toURI()).getPath();
+            
+            // Check if file matches any include pattern
+            boolean included = false;
+            for (String include : includes) {
+                if (matchesAntPattern(relativePath, include)) {
+                    included = true;
+                    break;
                 }
             }
+            
+            if (!included) {
+                return false;
+            }
+            
+            // Check if file matches any exclude pattern
+            if (excludes != null) {
+                for (String exclude : excludes) {
+                    if (matchesAntPattern(relativePath, exclude)) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
         }
         
-        return true;
-    }
-
-    private boolean matchesPattern(String path, String pattern) {
-        String regex = pattern
-            .replace(".", "\\.")
-            .replace("**", ".*")
-            .replace("*", "[^/]*")
-            .replace("?", ".");
-        return path.matches(regex);
+        @Override
+        public boolean accept(File dir, String name) {
+            return accept(new File(dir, name));
+        }
+        
+        /**
+         * Matches a path against an Ant-style pattern.
+         * Supports:
+         * - ? matches one character
+         * - * matches zero or more characters (but not directory separators)
+         * - ** matches zero or more directories
+         */
+        private boolean matchesAntPattern(String path, String pattern) {
+            // Normalize paths to use forward slashes
+            path = FilenameUtils.separatorsToUnix(path);
+            pattern = FilenameUtils.separatorsToUnix(pattern);
+            
+            // Convert Ant pattern to regex
+            StringBuilder regex = new StringBuilder();
+            int i = 0;
+            
+            while (i < pattern.length()) {
+                char c = pattern.charAt(i);
+                
+                if (c == '*') {
+                    // Check for **
+                    if (i + 1 < pattern.length() && pattern.charAt(i + 1) == '*') {
+                        // Handle ** pattern
+                        if (i + 2 < pattern.length() && pattern.charAt(i + 2) == '/') {
+                            // **/ means any number of directories (including none)
+                            regex.append("(?:(?:.*/)?)?");
+                            i += 3; // Skip **/
+                        } else if (i == 0 || pattern.charAt(i - 1) == '/') {
+                            // /** at the end or in the middle
+                            regex.append(".*");
+                            i += 2; // Skip **
+                        } else {
+                            // Just two * in a row, treat as two wildcards
+                            regex.append("[^/]*[^/]*");
+                            i += 2;
+                        }
+                    } else {
+                        // Single * matches any characters except /
+                        regex.append("[^/]*");
+                        i++;
+                    }
+                } else if (c == '?') {
+                    // ? matches exactly one character except /
+                    regex.append("[^/]");
+                    i++;
+                } else if (c == '.' || c == '[' || c == ']' || c == '{' || c == '}' || 
+                          c == '(' || c == ')' || c == '+' || c == '^' || c == '$' || 
+                          c == '|' || c == '\\') {
+                    // Escape special regex characters
+                    regex.append('\\').append(c);
+                    i++;
+                } else {
+                    // Regular character
+                    regex.append(c);
+                    i++;
+                }
+            }
+            
+            return path.matches(regex.toString());
+        }
     }
 
     private ValidationResult validateFile(File file, JsonSchema schema) {
