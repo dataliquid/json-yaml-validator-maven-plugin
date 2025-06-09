@@ -1,0 +1,25 @@
+name: Gitflow Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Gitflow action to perform'
+        required: true
+        type: choice
+        options:
+          - release-start
+          - release-finish
+      version:
+        description: 'Release version (optional for auto-detection)'
+        required: false
+        type: string
+
+jobs:
+  release:
+    uses: dataliquid/github-actions/.github/workflows/gitflow-release.yml@main
+    with:
+      action: ${{ inputs.action }}
+      version: ${{ inputs.version }}
+      java-version: '8'
+      java-distribution: 'temurin'
