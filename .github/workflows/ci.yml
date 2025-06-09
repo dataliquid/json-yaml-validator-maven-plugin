@@ -26,7 +26,7 @@ jobs:
         cache: maven
     
     - name: Build with Maven
-      run: mvn clean install -B
+      run: mvn clean install -B -Dgpg.skip=true
     
     - name: Run tests
-      run: mvn test -B
+      run: mvn test -B -Dgpg.skip=true
