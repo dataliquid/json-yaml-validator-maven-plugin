@@ -13,7 +13,7 @@
 
     <groupId>com.dataliquid</groupId>
     <artifactId>json-yaml-validator-maven-plugin</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>maven-plugin</packaging>
 
     <name>JSON/YAML Validator Maven Plugin</name>
