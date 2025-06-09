@@ -1,0 +1,33 @@
+{
+  "eventId": "EVT-20240315",
+  "title": "International Technology Conference 2024",
+  "description": "Annual gathering of technology leaders and innovators",
+  "location": {
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "altitude": 15.5,
+    "accuracy": 10,
+    "timestamp": "2024-01-15T10:00:00Z"
+  },
+  "venue": {
+    "name": "Moscone Center",
+    "type": "conference_center",
+    "capacity": {
+      "minimum": 100,
+      "maximum": 5000,
+      "optimal": 2500
+    },
+    "amenities": ["wifi", "parking", "catering", "audio_visual", "accessibility"],
+    "address": "747 Howard St, San Francisco, CA 94103"
+  },
+  "schedule": {
+    "start": "2024-03-15T09:00:00Z",
+    "end": "2024-03-17T18:00:00Z",
+    "timezone": "America/Los_Angeles"
+  },
+  "registration": {
+    "required": true,
+    "url": "https://tech-conference-2024.com/register",
+    "deadline": "2024-03-01T23:59:59Z"
+  }
+}

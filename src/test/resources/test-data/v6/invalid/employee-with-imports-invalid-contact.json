@@ -1,0 +1,22 @@
+{
+  "employeeId": "EMP-123456",
+  "firstName": "Invalid",
+  "lastName": "Employee",
+  "contact": {
+    "email": "not-an-email",
+    "phone": "123",
+    "website": "not a valid uri",
+    "socialMedia": {
+      "twitter": "missing-@-symbol",
+      "linkedin": "not-a-uri",
+      "github": "invalid github name!",
+      "facebook": "not-allowed-property"
+    }
+  },
+  "roleInfo": {
+    "role": "manager",
+    "permissions": ["read"]
+  },
+  "department": "IT",
+  "startDate": "2022-03-15"
+}

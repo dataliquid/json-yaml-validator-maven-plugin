@@ -1,0 +1,26 @@
+eventId: WRONG-FORMAT
+title: Test
+description: ""
+location:
+  latitude: 0
+  longitude: 0
+venue:
+  name: ""
+  type: outdoor  # invalid venue type
+  capacity:
+    minimum: -10
+    maximum: 0  # must be >= 1
+    optimal: 500  # dependentRequired rule violated (has optimal but invalid min/max)
+  amenities:
+    - wifi
+    - breakfast  # invalid amenity
+    - wifi  # duplicate
+  address: 123 Test St
+schedule:
+  start: 2024-03-15
+  end: 2024-03-17
+  timezone: Invalid/Timezone
+registration:
+  required: true
+  # missing required url and deadline when required is true
+extraProperty: not allowed

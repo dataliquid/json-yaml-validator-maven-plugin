@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://example.com/schemas/v6/role-definitions.json",
+  "title": "Role Definitions",
+  "description": "Common role definitions",
+  "definitions": {
+    "userRole": {
+      "type": "string",
+      "enum": ["admin", "manager", "user", "guest"]
+    },
+    "permission": {
+      "type": "string",
+      "enum": ["read", "write", "delete", "execute"]
+    },
+    "rolePermissions": {
+      "type": "object",
+      "properties": {
+        "role": { "$ref": "#/definitions/userRole" },
+        "permissions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/permission" },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["role", "permissions"]
+    }
+  }
+}

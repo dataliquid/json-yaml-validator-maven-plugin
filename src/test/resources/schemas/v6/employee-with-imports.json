@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "http://example.com/schemas/v6/employee-with-imports.json",
+  "title": "Employee with Imports",
+  "description": "Employee schema that imports contact and role schemas",
+  "type": "object",
+  "properties": {
+    "employeeId": {
+      "type": "string",
+      "pattern": "^EMP-[0-9]{6}$"
+    },
+    "firstName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lastName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contact": {
+      "$ref": "contact-info.json"
+    },
+    "roleInfo": {
+      "$ref": "role-definitions.json#/definitions/rolePermissions"
+    },
+    "department": {
+      "type": "string",
+      "enum": ["IT", "HR", "Finance", "Marketing", "Operations"]
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": ["employeeId", "firstName", "lastName", "contact", "roleInfo", "department"],
+  "additionalProperties": false
+}

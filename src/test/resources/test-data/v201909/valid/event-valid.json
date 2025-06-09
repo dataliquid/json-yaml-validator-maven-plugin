@@ -1,0 +1,42 @@
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Annual Tech Conference 2024",
+  "eventType": "conference",
+  "schedule": {
+    "startDate": "2024-06-15T09:00:00Z",
+    "endDate": "2024-06-17T18:00:00Z",
+    "timezone": "America/New_York"
+  },
+  "attendees": [
+    {
+      "name": "John Speaker",
+      "email": "john@techconf.com",
+      "role": "speaker"
+    },
+    {
+      "name": "Jane Organizer",
+      "email": "jane@techconf.com",
+      "role": "organizer"
+    },
+    {
+      "name": "Bob Participant",
+      "email": "bob@example.com",
+      "role": "participant"
+    }
+  ],
+  "location": {
+    "type": "physical",
+    "venue": "Convention Center",
+    "address": {
+      "street": "123 Conference Blvd",
+      "city": "San Francisco",
+      "country": "US"
+    }
+  },
+  "metadata": {
+    "tag_category": "technology",
+    "tag_level": "professional",
+    "count_expected": 500,
+    "count_registered": 450
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "organizationId": "ORG-123456",
+  "name": "Tech Solutions Inc.",
+  "contactEmail": "info@techsolutions.com",
+  "contactPhone": "+14155551234",
+  "headquarters": {
+    "street": "100 Tech Way",
+    "city": "San Francisco",
+    "state": "CA",
+    "postalCode": "94105",
+    "country": "USA"
+  },
+  "branches": [
+    {
+      "street": "200 Innovation Drive",
+      "city": "Austin",
+      "state": "TX",
+      "postalCode": "78701",
+      "country": "USA"
+    },
+    {
+      "street": "300 Digital Avenue",
+      "city": "Seattle",
+      "state": "WA",
+      "postalCode": "98101",
+      "country": "USA"
+    }
+  ]
+}

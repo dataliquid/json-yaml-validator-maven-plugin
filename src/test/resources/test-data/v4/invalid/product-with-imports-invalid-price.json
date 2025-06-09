@@ -1,0 +1,22 @@
+{
+  "productId": "PROD-123456",
+  "name": "Invalid Product",
+  "price": {
+    "amount": -50,
+    "currency": "INVALID_CURRENCY"
+  },
+  "dimensions": {
+    "length": 35.5,
+    "width": 24.2,
+    "height": 1.8,
+    "unit": "cm"
+  },
+  "supplier": {
+    "supplierId": "SUP-12345",
+    "name": "TechCorp Industries",
+    "contact": {
+      "email": "sales@techcorp.com"
+    }
+  },
+  "inStock": true
+}

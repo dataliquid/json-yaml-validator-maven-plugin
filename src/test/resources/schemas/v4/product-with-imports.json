@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://example.com/schemas/v4/product-with-imports.json",
+  "title": "Product with Imports",
+  "description": "Product that imports definitions from other schemas",
+  "type": "object",
+  "properties": {
+    "productId": {
+      "type": "string",
+      "pattern": "^PROD-[0-9]{6}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "price": {
+      "$ref": "common-definitions.json#/definitions/money"
+    },
+    "dimensions": {
+      "$ref": "common-definitions.json#/definitions/dimensions"
+    },
+    "supplier": {
+      "$ref": "supplier.json"
+    },
+    "inStock": {
+      "type": "boolean"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": ["productId", "name", "price", "supplier"]
+}

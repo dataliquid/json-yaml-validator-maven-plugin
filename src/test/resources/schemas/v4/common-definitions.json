@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://example.com/schemas/v4/common-definitions.json",
+  "title": "Common Definitions",
+  "description": "Common type definitions for v4",
+  "definitions": {
+    "price": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 999999.99
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["USD", "EUR", "GBP", "JPY"]
+    },
+    "money": {
+      "type": "object",
+      "properties": {
+        "amount": { "$ref": "#/definitions/price" },
+        "currency": { "$ref": "#/definitions/currency" }
+      },
+      "required": ["amount", "currency"]
+    },
+    "dimensions": {
+      "type": "object",
+      "properties": {
+        "length": { "type": "number", "minimum": 0 },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 },
+        "unit": { "type": "string", "enum": ["cm", "inch", "m"] }
+      },
+      "required": ["length", "width", "height", "unit"]
+    }
+  }
+}

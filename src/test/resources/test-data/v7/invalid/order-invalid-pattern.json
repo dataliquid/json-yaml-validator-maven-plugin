@@ -1,0 +1,10 @@
+{
+  "orderId": "INVALID-ID",
+  "customer": {
+    "name": "Test User",
+    "email": "test@example.com"
+  },
+  "items": [],
+  "total": -10,
+  "status": "unknown"
+}

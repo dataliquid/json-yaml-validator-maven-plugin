@@ -1,0 +1,10 @@
+{
+  "username": "john_doe123",
+  "email": "john.doe@example.com",
+  "age": 25,
+  "roles": ["user", "admin"],
+  "profile": {
+    "bio": "Software developer with 5 years of experience",
+    "website": "https://johndoe.com"
+  }
+}

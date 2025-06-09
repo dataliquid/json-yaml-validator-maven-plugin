@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/order-with-imports.json",
+  "title": "Order with Imports",
+  "description": "An order that imports customer and address schemas",
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "pattern": "^ORD-[0-9]{8}$"
+    },
+    "orderDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "customer": {
+      "$ref": "http://example.com/schemas/customer.json"
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["productId", "quantity", "price"]
+      }
+    },
+    "deliveryAddress": {
+      "$ref": "http://example.com/schemas/address.json"
+    },
+    "total": {
+      "type": "number",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "processing", "shipped", "delivered", "cancelled"]
+    }
+  },
+  "required": ["orderId", "orderDate", "customer", "items", "deliveryAddress", "total", "status"]
+}

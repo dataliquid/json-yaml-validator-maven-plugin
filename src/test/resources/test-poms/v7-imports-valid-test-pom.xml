@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.dataliquid.maven</groupId>
+    <artifactId>v7-imports-valid-test</artifactId>
+    <version>1.0.0</version>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.dataliquid.maven</groupId>
+                <artifactId>json-yaml-validator-maven-plugin</artifactId>
+                <version>@project.version@</version>
+                <configuration>
+                    <schemaFile>${basedir}/src/test/resources/schemas/v7/order-with-imports.json</schemaFile>
+                    <sourceDirectory>${basedir}/src/test/resources/test-data/v7/valid</sourceDirectory>
+                    <includes>
+                        <include>order-with-imports-valid.json</include>
+                        <include>order-with-imports-valid.yaml</include>
+                    </includes>
+                    <schemaVersion>V7</schemaVersion>
+                    <failOnError>true</failOnError>
+                    <schemaMappings>
+                        <schemaMapping>http://example.com/schemas/=${basedir}/src/test/resources/schemas/v7/</schemaMapping>
+                    </schemaMappings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

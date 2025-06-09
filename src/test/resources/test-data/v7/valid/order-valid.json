@@ -1,0 +1,30 @@
+{
+  "orderId": "ORD-12345678",
+  "customer": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+14155552671",
+    "discount": 0.0
+  },
+  "items": [
+    {
+      "productId": "PROD-001",
+      "quantity": 2,
+      "price": 29.99
+    },
+    {
+      "productId": "PROD-002",
+      "quantity": 1,
+      "price": 49.99
+    }
+  ],
+  "total": 109.97,
+  "status": "processing",
+  "shippingAddress": {
+    "street": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": "94105",
+    "country": "USA"
+  }
+}

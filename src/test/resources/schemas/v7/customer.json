@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/customer.json",
+  "title": "Customer",
+  "description": "A customer profile",
+  "type": "object",
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "pattern": "^CUST-[0-9]{6}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string",
+      "pattern": "^\\+?[1-9]\\d{1,14}$"
+    },
+    "billingAddress": {
+      "$ref": "http://example.com/schemas/address.json"
+    },
+    "shippingAddress": {
+      "$ref": "http://example.com/schemas/address.json"
+    }
+  },
+  "required": ["customerId", "name", "email", "billingAddress"]
+}

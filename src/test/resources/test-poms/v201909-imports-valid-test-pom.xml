@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.dataliquid.maven</groupId>
+    <artifactId>v201909-imports-valid-test</artifactId>
+    <version>1.0.0</version>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.dataliquid.maven</groupId>
+                <artifactId>json-yaml-validator-maven-plugin</artifactId>
+                <version>@project.version@</version>
+                <configuration>
+                    <schemaFile>${basedir}/src/test/resources/schemas/v201909/event-with-imports.json</schemaFile>
+                    <sourceDirectory>${basedir}/src/test/resources/test-data/v201909/valid</sourceDirectory>
+                    <includes>
+                        <include>event-with-imports-valid.json</include>
+                        <include>event-with-imports-valid.yaml</include>
+                    </includes>
+                    <schemaVersion>V201909</schemaVersion>
+                    <failOnError>true</failOnError>
+                    <schemaMappings>
+                        <schemaMapping>http://example.com/schemas/v201909/=${basedir}/src/test/resources/schemas/v201909/</schemaMapping>
+                    </schemaMappings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

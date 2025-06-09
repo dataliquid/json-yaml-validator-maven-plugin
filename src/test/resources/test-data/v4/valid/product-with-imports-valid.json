@@ -1,0 +1,25 @@
+{
+  "productId": "PROD-123456",
+  "name": "Premium Laptop",
+  "price": {
+    "amount": 1299.99,
+    "currency": "USD"
+  },
+  "dimensions": {
+    "length": 35.5,
+    "width": 24.2,
+    "height": 1.8,
+    "unit": "cm"
+  },
+  "supplier": {
+    "supplierId": "SUP-12345",
+    "name": "TechCorp Industries",
+    "contact": {
+      "email": "sales@techcorp.com",
+      "phone": "+1234567890"
+    },
+    "rating": 4.5
+  },
+  "inStock": true,
+  "tags": ["laptop", "premium", "business"]
+}

@@ -1,0 +1,5 @@
+username: alice_smith
+email: alice@example.org
+roles: 
+  - user
+  - guest
