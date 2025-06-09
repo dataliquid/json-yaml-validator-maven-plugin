@@ -1,7 +1,7 @@
 # JSON/YAML Validator Maven Plugin
 
 [![CI Build](https://github.com/dataliquid/json-yaml-validator-maven-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/dataliquid/json-yaml-validator-maven-plugin/actions/workflows/ci.yml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.dataliquid/json-yaml-validator-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.dataliquid/json-yaml-validator-maven-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.dataliquid.maven/json-yaml-validator-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.dataliquid.maven/json-yaml-validator-maven-plugin)
 
 A Maven plugin for validating JSON and YAML files against a JSON Schema using the [networknt/json-schema-validator](https://github.com/networknt/json-schema-validator) library.
 
