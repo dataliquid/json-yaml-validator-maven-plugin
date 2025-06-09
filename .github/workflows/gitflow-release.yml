@@ -17,7 +17,7 @@ on:
 
 jobs:
   release:
-    uses: dataliquid/github-actions/.github/workflows/gitflow-release.yml@main
+    uses: dataliquid/github-actions/.github/workflows/gitflow-release.yml@master
     with:
       action: ${{ inputs.action }}
       version: ${{ inputs.version }}
