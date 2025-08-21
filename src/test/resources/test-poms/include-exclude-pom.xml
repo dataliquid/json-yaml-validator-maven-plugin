@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.dataliquid.maven.test</groupId>
+    <artifactId>include-exclude-test</artifactId>
+    <version>1.0.0</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.dataliquid.maven</groupId>
+                <artifactId>json-yaml-validator-maven-plugin</artifactId>
+                <version>@project.version@</version>
+                <configuration>
+                    <schemaFile>src/test/resources/schemas/include-exclude/simple-schema.json</schemaFile>
+                    <sourceDirectory>src/test/resources/test-data/include-exclude-test</sourceDirectory>
+                    
+                    <!-- Only validate specific file types -->
+                    <includes>
+                        <include>**/*.json</include>
+                        <include>**/*.yaml</include>
+                        <include>**/*.yml</include>
+                    </includes>
+                    
+                    <!-- Exclude certain files -->
+                    <excludes>
+                        <exclude>**/draft/**</exclude>
+                        <exclude>**/temp/**</exclude>
+                        <exclude>**/*.backup.json</exclude>
+                    </excludes>
+                    
+                    <failOnError>true</failOnError>
+                    <schemaVersion>V202012</schemaVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
