@@ -7,8 +7,13 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 
 /**
  * Custom file filter that handles Ant-style patterns for includes/excludes.
- * Supports: - ? matches one character - * matches zero or more characters (but
- * not directory separators) - ** matches zero or more directories
+ * <p>
+ * Supports:
+ * <ul>
+ * <li>? matches one character</li>
+ * <li>* matches zero or more characters (but not directory separators)</li>
+ * <li>** matches zero or more directories</li>
+ * </ul>
  */
 public class AntPatternFileFilter implements IOFileFilter {
 

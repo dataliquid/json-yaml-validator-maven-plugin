@@ -15,9 +15,10 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 
 /**
  * Test case for validating include/exclude functionality with recursive
- * directory traversal. IMPORTANT: This test demonstrates that the exclude
- * functionality is NOT working correctly! Files in 'draft' and 'temp'
- * directories are NOT being excluded as expected.
+ * directory traversal.
+ * <p>
+ * IMPORTANT: This test demonstrates that the exclude functionality is NOT working correctly!
+ * Files in 'draft' and 'temp' directories are NOT being excluded as expected.
  */
 public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCase {
 
@@ -26,17 +27,34 @@ public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCas
     /**
      * Test that validates the exact count of processed files. This test ensures
      * that the include/exclude patterns work correctly by verifying that exactly 7
-     * files are processed out of the 13 total files. Expected behavior: - Include:
-     * All .json, .yaml, and .yml files - Exclude: All files in 'draft' and 'temp'
-     * directories, and all .backup.json files Should validate these 7 files: 1.
-     * config.json (root level) 2. data.yaml (root level) 3. level1/config.json 4.
-     * level1/normal/normal.yaml 5. level1/level2/data.json 6.
-     * level1/level2/level3/deep.json 7. level1/level2/level3/config.yml Should
-     * exclude these 6 files: 1. data.backup.json (root level - matches
-     * *.backup.json) 2. draft/draft-config.json (in draft directory) 3.
-     * temp/temp-data.yml (in temp directory) 4. level1/level2/config.backup.json
-     * (matches *.backup.json) 5. level1/level2/draft/draft.json (in draft
-     * directory) 6. level1/level2/temp/temp.yaml (in temp directory)
+     * files are processed out of the 13 total files.
+     * <p>
+     * Expected behavior:
+     * <ul>
+     * <li>Include: All .json, .yaml, and .yml files</li>
+     * <li>Exclude: All files in 'draft' and 'temp' directories, and all .backup.json files</li>
+     * </ul>
+     * <p>
+     * Should validate these 7 files:
+     * <ol>
+     * <li>config.json (root level)</li>
+     * <li>data.yaml (root level)</li>
+     * <li>level1/config.json</li>
+     * <li>level1/normal/normal.yaml</li>
+     * <li>level1/level2/data.json</li>
+     * <li>level1/level2/level3/deep.json</li>
+     * <li>level1/level2/level3/config.yml</li>
+     * </ol>
+     * <p>
+     * Should exclude these 6 files:
+     * <ol>
+     * <li>data.backup.json (root level - matches *.backup.json)</li>
+     * <li>draft/draft-config.json (in draft directory)</li>
+     * <li>temp/temp-data.yml (in temp directory)</li>
+     * <li>level1/level2/config.backup.json (matches *.backup.json)</li>
+     * <li>level1/level2/draft/draft.json (in draft directory)</li>
+     * <li>level1/level2/temp/temp.yaml (in temp directory)</li>
+     * </ol>
      */
     public void testIncludeExcludePatterns() throws Exception {
         File pom = getTestFile("src/test/resources/test-poms/include-exclude-pom.xml");
@@ -75,8 +93,8 @@ public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCas
     }
 
     /**
-     * Helper method to count the files that would be validated by the mojo. Uses
-     * reflection to access private methods and fields.
+     * Helper method to count the files that would be validated by the mojo.
+     * Uses reflection to access private methods and fields.
      */
     private int countValidatedFiles(JsonYamlValidatorMojo mojo) throws Exception {
         // Use reflection to call findFilesToValidate
@@ -119,8 +137,8 @@ public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCas
     }
 
     /**
-     * Test to verify all files in the test directory structure. This helps
-     * understand what files exist and what the mojo is finding.
+     * Test to verify all files in the test directory structure.
+     * This helps understand what files exist and what the mojo is finding.
      */
     public void testVerifyTestDirectoryStructure() throws Exception {
         File testDir = getTestFile(TEST_DATA_DIR);
