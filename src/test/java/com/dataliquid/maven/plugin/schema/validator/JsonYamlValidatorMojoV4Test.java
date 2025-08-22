@@ -16,7 +16,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -28,7 +28,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -40,7 +40,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid price");
@@ -57,7 +57,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to missing required fields");
@@ -74,7 +74,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception even with invalid data
         mojo.execute();
     }
@@ -86,7 +86,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception - tests schema importing
         mojo.execute();
     }
@@ -98,7 +98,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid price and currency");
@@ -115,7 +115,7 @@ public class JsonYamlValidatorMojoV4Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid supplier data");

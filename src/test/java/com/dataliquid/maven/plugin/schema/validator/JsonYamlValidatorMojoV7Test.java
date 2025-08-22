@@ -16,7 +16,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -28,7 +28,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -40,7 +40,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid patterns");
@@ -57,7 +57,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to wrong VIP discount");
@@ -75,7 +75,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // VIP customer with correct 0.2 discount
         mojo.execute();
     }
@@ -87,7 +87,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception - tests schema importing
         mojo.execute();
     }
@@ -99,7 +99,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid address in imported schema");
@@ -116,7 +116,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid customer in imported schema");
@@ -134,7 +134,7 @@ public class JsonYamlValidatorMojoV7Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should successfully validate data that uses imported schemas
         mojo.execute();
     }

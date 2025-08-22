@@ -16,7 +16,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -28,7 +28,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -40,7 +40,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid UUID and other errors");
@@ -57,7 +57,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid metadata");
@@ -75,7 +75,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Online event with proper structure
         mojo.execute();
     }
@@ -88,7 +88,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Has startDate with timezone
         mojo.execute();
     }
@@ -100,7 +100,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception - tests schema importing
         mojo.execute();
     }
@@ -112,7 +112,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid location data");
@@ -129,7 +129,7 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid venue and other errors");

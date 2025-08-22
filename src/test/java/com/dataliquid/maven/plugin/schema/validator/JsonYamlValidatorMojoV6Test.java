@@ -16,7 +16,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -28,7 +28,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -40,7 +40,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid patterns");
@@ -57,7 +57,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid properties");
@@ -75,7 +75,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // The valid user has 'user' role which satisfies the contains constraint
         mojo.execute();
     }
@@ -87,7 +87,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception - tests schema importing
         mojo.execute();
     }
@@ -99,7 +99,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid contact information");
@@ -116,7 +116,7 @@ public class JsonYamlValidatorMojoV6Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid role and other errors");
