@@ -16,7 +16,7 @@ public class JsonYamlValidatorMojoFailOnNoFilesTest extends AbstractMojoTestCase
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException when no files found with default failOnNoFilesFound=true");
@@ -33,7 +33,7 @@ public class JsonYamlValidatorMojoFailOnNoFilesTest extends AbstractMojoTestCase
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException when no files found with failOnNoFilesFound=true");
@@ -51,7 +51,7 @@ public class JsonYamlValidatorMojoFailOnNoFilesTest extends AbstractMojoTestCase
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception when failOnNoFilesFound=false
         mojo.execute();
     }
@@ -63,7 +63,7 @@ public class JsonYamlValidatorMojoFailOnNoFilesTest extends AbstractMojoTestCase
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException when source directory doesn't exist with default failOnNoFilesFound=true");
