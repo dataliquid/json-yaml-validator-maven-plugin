@@ -17,8 +17,9 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
  * Test case for validating include/exclude functionality with recursive
  * directory traversal.
  * <p>
- * IMPORTANT: This test demonstrates that the exclude functionality is NOT working correctly!
- * Files in 'draft' and 'temp' directories are NOT being excluded as expected.
+ * IMPORTANT: This test demonstrates that the exclude functionality is NOT
+ * working correctly! Files in 'draft' and 'temp' directories are NOT being
+ * excluded as expected.
  */
 public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCase {
 
@@ -32,7 +33,8 @@ public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCas
      * Expected behavior:
      * <ul>
      * <li>Include: All .json, .yaml, and .yml files</li>
-     * <li>Exclude: All files in 'draft' and 'temp' directories, and all .backup.json files</li>
+     * <li>Exclude: All files in 'draft' and 'temp' directories, and all
+     * .backup.json files</li>
      * </ul>
      * <p>
      * Should validate these 7 files:
@@ -93,8 +95,8 @@ public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCas
     }
 
     /**
-     * Helper method to count the files that would be validated by the mojo.
-     * Uses reflection to access private methods and fields.
+     * Helper method to count the files that would be validated by the mojo. Uses
+     * reflection to access private methods and fields.
      */
     private int countValidatedFiles(JsonYamlValidatorMojo mojo) throws Exception {
         // Use reflection to call findFilesToValidate
@@ -137,8 +139,8 @@ public class JsonYamlValidatorMojoIncludeExcludeTest extends AbstractMojoTestCas
     }
 
     /**
-     * Test to verify all files in the test directory structure.
-     * This helps understand what files exist and what the mojo is finding.
+     * Test to verify all files in the test directory structure. This helps
+     * understand what files exist and what the mojo is finding.
      */
     public void testVerifyTestDirectoryStructure() throws Exception {
         File testDir = getTestFile(TEST_DATA_DIR);
