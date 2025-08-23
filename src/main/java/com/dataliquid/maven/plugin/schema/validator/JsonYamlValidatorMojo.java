@@ -113,9 +113,9 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
 
             factory = JsonSchemaFactory.getInstance(version, builder -> builder.schemaMappers(schemaMappers -> {
                 // Add mappings from configuration
+                final int MAPPING_PARTS_EXPECTED = 2;
                 for (String mapping : schemaMappings) {
-                    String[] parts = mapping.split("=", 2);
-                    final int MAPPING_PARTS_EXPECTED = 2;
+                    String[] parts = mapping.split("=", MAPPING_PARTS_EXPECTED);
                     if (parts.length == MAPPING_PARTS_EXPECTED) {
                         String schemaId = parts[0].trim();
                         String localPath = parts[1].trim();
