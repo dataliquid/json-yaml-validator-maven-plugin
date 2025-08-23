@@ -146,6 +146,20 @@
                 </executions>
             </plugin>
             
+            <!-- Configure PMD to exclude generated files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <excludeRoots>
+                        <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
+                    </excludeRoots>
+                    <excludes>
+                        <exclude>**/HelpMojo.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            
             <!-- Maven Resources Plugin to filter test POMs with current version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
