@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,8 +96,11 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private JsonSchema loadSchema() throws IOException, MojoExecutionException {
-        getLog().info("Loading schema from: " + schemaFile.getAbsolutePath());
+        if (getLog().isInfoEnabled()) {
+            getLog().info("Loading schema from: " + schemaFile.getAbsolutePath());
+        }
 
         JsonNode schemaNode = readFile(schemaFile);
         SpecVersion.VersionFlag version = getSchemaVersion();
@@ -105,13 +110,14 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         // If schema mappings are configured, create factory with custom schema mappers
         if (schemaMappings != null && schemaMappings.length > 0) {
             // Collect prefix mappings and direct mappings separately
-            Map<String, String> directMappings = new HashMap<>();
+            Map<String, String> directMappings = new ConcurrentHashMap<>();
 
             factory = JsonSchemaFactory.getInstance(version, builder -> builder.schemaMappers(schemaMappers -> {
                 // Add mappings from configuration
                 for (String mapping : schemaMappings) {
                     String[] parts = mapping.split("=", 2);
-                    if (parts.length == 2) {
+                    final int MAPPING_PARTS_EXPECTED = 2;
+                    if (parts.length == MAPPING_PARTS_EXPECTED) {
                         String schemaId = parts[0].trim();
                         String localPath = parts[1].trim();
 
@@ -123,8 +129,10 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
                             mappedUri = localPath;
                         } else {
                             // Convert file path to proper file URI
-                            File localFile = new File(localPath);
-                            if (!localFile.isAbsolute()) {
+                            File localFile;
+                            if (new File(localPath).isAbsolute()) {
+                                localFile = new File(localPath);
+                            } else {
                                 // Make relative paths relative to schema directory
                                 localFile = new File(schemaFile.getParentFile(), localPath);
                             }
@@ -134,28 +142,40 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
                         // Check if this is a prefix mapping (ends with /) or a direct mapping
                         if (schemaId.endsWith("/") && localPath.endsWith("/")) {
                             // This is a prefix mapping for a directory
-                            getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
+                            if (getLog().isInfoEnabled()) {
+                                getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
+                            }
                             schemaMappers.mapPrefix(schemaId, mappedUri);
                         } else if (schemaId.endsWith("/") && !localPath.endsWith("/")) {
                             // Schema ID is a prefix but local path is a directory - ensure it ends with /
-                            File dir = new File(localPath);
-                            if (!dir.isAbsolute()) {
+                            File dir;
+                            if (new File(localPath).isAbsolute()) {
+                                dir = new File(localPath);
+                            } else {
                                 dir = new File(schemaFile.getParentFile(), localPath);
                             }
                             if (dir.isDirectory()) {
                                 mappedUri = dir.toURI().toString();
-                                getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
+                                if (getLog().isInfoEnabled()) {
+                                    getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
+                                }
                                 schemaMappers.mapPrefix(schemaId, mappedUri);
                             } else {
-                                getLog().warn("Schema prefix mapping points to non-directory: " + localPath);
+                                if (getLog().isWarnEnabled()) {
+                                    getLog().warn("Schema prefix mapping points to non-directory: " + localPath);
+                                }
                             }
                         } else {
                             // This is a direct schema mapping - add to map
-                            getLog().info("Adding direct schema mapping: " + schemaId + " -> " + mappedUri);
+                            if (getLog().isInfoEnabled()) {
+                                getLog().info("Adding direct schema mapping: " + schemaId + " -> " + mappedUri);
+                            }
                             directMappings.put(schemaId, mappedUri);
                         }
                     } else {
-                        getLog().warn("Invalid schema mapping format: " + mapping + " (expected: schemaId=path)");
+                        if (getLog().isWarnEnabled()) {
+                            getLog().warn("Invalid schema mapping format: " + mapping + " (expected: schemaId=path)");
+                        }
                     }
                 }
 
@@ -173,7 +193,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     }
 
     private SpecVersion.VersionFlag getSchemaVersion() throws MojoExecutionException {
-        switch (schemaVersion.toUpperCase()) {
+        switch (schemaVersion.toUpperCase(Locale.ROOT)) {
         case "V4":
             return SpecVersion.VersionFlag.V4;
         case "V6":
@@ -193,7 +213,9 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         List<ValidationResult> results = new ArrayList<>();
         List<File> filesToValidate = findFilesToValidate();
 
-        getLog().info("Found " + filesToValidate.size() + " files to validate");
+        if (getLog().isInfoEnabled()) {
+            getLog().info("Found " + filesToValidate.size() + " files to validate");
+        }
 
         if (filesToValidate.isEmpty() && failOnNoFilesFound) {
             getLog().debug("failOnNoFilesFound is true and no files found - throwing exception");
@@ -210,7 +232,9 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
 
     private List<File> findFilesToValidate() throws IOException {
         if (!sourceDirectory.exists()) {
-            getLog().warn("Source directory does not exist: " + sourceDirectory.getAbsolutePath());
+            if (getLog().isWarnEnabled()) {
+                getLog().warn("Source directory does not exist: " + sourceDirectory.getAbsolutePath());
+            }
             return new ArrayList<>();
         }
 
@@ -224,7 +248,9 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     }
 
     private ValidationResult validateFile(File file, JsonSchema schema) {
-        getLog().debug("Validating: " + file.getAbsolutePath());
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Validating: " + file.getAbsolutePath());
+        }
 
         try {
             JsonNode content = readFile(file);
@@ -237,7 +263,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     }
 
     private JsonNode readFile(File file) throws IOException {
-        String fileName = file.getName().toLowerCase();
+        String fileName = file.getName().toLowerCase(Locale.ROOT);
         if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) {
             return yamlMapper.readTree(file);
         } else {
@@ -249,21 +275,31 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         int totalFiles = results.size();
         int failedFiles = (int) results.stream().filter(r -> !r.isValid()).count();
 
-        getLog().info(String.format("Validation complete: %d files processed, %d failed", totalFiles, failedFiles));
+        if (getLog().isInfoEnabled()) {
+            getLog().info(String.format("Validation complete: %d files processed, %d failed", totalFiles, failedFiles));
+        }
 
         for (ValidationResult result : results) {
             if (!result.isValid()) {
-                getLog().error("Validation failed for: " + result.getFile().getAbsolutePath());
+                if (getLog().isErrorEnabled()) {
+                    getLog().error("Validation failed for: " + result.getFile().getAbsolutePath());
+                }
 
                 if (result.getException() != null) {
-                    getLog().error("  Error: " + result.getException().getMessage());
+                    if (getLog().isErrorEnabled()) {
+                        getLog().error("  Error: " + result.getException().getMessage());
+                    }
                 } else {
                     for (ValidationMessage error : result.getErrors()) {
-                        getLog().error("  - " + error.getMessage());
+                        if (getLog().isErrorEnabled()) {
+                            getLog().error("  - " + error.getMessage());
+                        }
                     }
                 }
             } else {
-                getLog().debug("Validation passed for: " + result.getFile().getAbsolutePath());
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Validation passed for: " + result.getFile().getAbsolutePath());
+                }
             }
         }
     }
