@@ -21,6 +21,9 @@ public class AntPatternFileFilter implements IOFileFilter {
     private static final int DOUBLE_STAR_SLASH_LENGTH = 3;
     private static final int DOUBLE_STAR_LENGTH = 2;
     private static final int ZERO_INDEX = 0;
+    private static final char STAR_CHAR = '*';
+    private static final char QUESTION_CHAR = '?';
+    private static final char SLASH_CHAR = '/';
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private final File sourceDirectory;
@@ -70,7 +73,6 @@ public class AntPatternFileFilter implements IOFileFilter {
     /**
      * Matches a path against an Ant-style pattern.
      */
-    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     private boolean matchesAntPattern(String path, String pattern) {
         // Normalize paths to use forward slashes
         String normalizedPath = FilenameUtils.separatorsToUnix(path);
@@ -83,17 +85,17 @@ public class AntPatternFileFilter implements IOFileFilter {
         while (i < normalizedPattern.length()) {
             char c = normalizedPattern.charAt(i);
 
-            if (c == '*') {
+            if (c == STAR_CHAR) {
                 // Check for **
                 if (i + MIN_DOUBLE_STAR_LENGTH < normalizedPattern.length()
-                        && normalizedPattern.charAt(i + MIN_DOUBLE_STAR_LENGTH) == '*') {
+                        && normalizedPattern.charAt(i + MIN_DOUBLE_STAR_LENGTH) == STAR_CHAR) {
                     // Handle ** pattern
                     if (i + DOUBLE_STAR_LENGTH < normalizedPattern.length()
-                            && normalizedPattern.charAt(i + DOUBLE_STAR_LENGTH) == '/') {
+                            && normalizedPattern.charAt(i + DOUBLE_STAR_LENGTH) == SLASH_CHAR) {
                         // **/ means any number of directories (including none)
                         regex.append("(?:(?:.*/)?)?");
                         i += DOUBLE_STAR_SLASH_LENGTH; // Skip **/
-                    } else if (i == ZERO_INDEX || normalizedPattern.charAt(i - MIN_DOUBLE_STAR_LENGTH) == '/') {
+                    } else if (i == ZERO_INDEX || normalizedPattern.charAt(i - MIN_DOUBLE_STAR_LENGTH) == SLASH_CHAR) {
                         // /** at the end or in the middle
                         regex.append(".*");
                         i += DOUBLE_STAR_LENGTH; // Skip **
@@ -107,7 +109,7 @@ public class AntPatternFileFilter implements IOFileFilter {
                     regex.append("[^/]*");
                     i++;
                 }
-            } else if (c == '?') {
+            } else if (c == QUESTION_CHAR) {
                 // ? matches exactly one character except /
                 regex.append("[^/]");
                 i++;

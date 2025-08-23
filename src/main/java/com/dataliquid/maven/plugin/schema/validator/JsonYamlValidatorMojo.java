@@ -96,7 +96,6 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         }
     }
 
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private JsonSchema loadSchema() throws IOException, MojoExecutionException {
         if (getLog().isInfoEnabled()) {
             getLog().info("Loading schema from: " + schemaFile.getAbsolutePath());
@@ -129,13 +128,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
                             mappedUri = localPath;
                         } else {
                             // Convert file path to proper file URI
-                            File localFile;
-                            if (new File(localPath).isAbsolute()) {
-                                localFile = new File(localPath);
-                            } else {
-                                // Make relative paths relative to schema directory
-                                localFile = new File(schemaFile.getParentFile(), localPath);
-                            }
+                            File localFile = resolveFile(localPath, schemaFile.getParentFile());
                             mappedUri = localFile.toURI().toString();
                         }
 
@@ -148,12 +141,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
                             schemaMappers.mapPrefix(schemaId, mappedUri);
                         } else if (schemaId.endsWith("/") && !localPath.endsWith("/")) {
                             // Schema ID is a prefix but local path is a directory - ensure it ends with /
-                            File dir;
-                            if (new File(localPath).isAbsolute()) {
-                                dir = new File(localPath);
-                            } else {
-                                dir = new File(schemaFile.getParentFile(), localPath);
-                            }
+                            File dir = resolveFile(localPath, schemaFile.getParentFile());
                             if (dir.isDirectory()) {
                                 mappedUri = dir.toURI().toString();
                                 if (getLog().isInfoEnabled()) {
@@ -306,6 +294,15 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
 
     private boolean hasErrors(List<ValidationResult> results) {
         return results.stream().anyMatch(r -> !r.isValid());
+    }
+
+    private File resolveFile(String path, File parentDir) {
+        File file = new File(path);
+        if (file.isAbsolute()) {
+            return file;
+        } else {
+            return new File(parentDir, path);
+        }
     }
 
     private static class ValidationResult {
