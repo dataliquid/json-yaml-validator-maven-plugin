@@ -257,7 +257,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) {
             Yaml snakeYaml = new Yaml();
             Object loadedYaml;
-            try (InputStream in = new FileInputStream(file)) {
+            try (InputStream in = Files.newInputStream(file.toPath())) {
                 loadedYaml = snakeYaml.load(in);
             }
             return yamlMapper.valueToTree(loadedYaml);
