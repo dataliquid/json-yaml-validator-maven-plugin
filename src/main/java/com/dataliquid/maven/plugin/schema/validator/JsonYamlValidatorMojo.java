@@ -71,7 +71,6 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     private final ObjectMapper jsonMapper = new ObjectMapper();
     private final ObjectMapper yamlMapper = new ObjectMapper();
 
-    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skip) {
