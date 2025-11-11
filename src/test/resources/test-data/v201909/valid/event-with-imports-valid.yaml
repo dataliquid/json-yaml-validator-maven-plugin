@@ -2,8 +2,8 @@ eventId: EVT-20240620
 title: Virtual DevOps Summit
 description: Online conference for DevOps professionals
 location:
-  latitude: 0
-  longitude: 0
+  latitude: &zero 0
+  longitude: *zero
   timestamp: "2024-02-01T12:00:00Z"
 venue:
   name: Virtual Conference Platform
