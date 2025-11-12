@@ -2,6 +2,8 @@ package com.dataliquid.maven.plugin.schema.validator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ import com.dataliquid.maven.plugin.schema.validator.utils.AntPatternFileFilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.yaml.snakeyaml.Yaml;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
@@ -67,7 +69,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     private boolean failOnNoFilesFound;
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    private final ObjectMapper yamlMapper = new ObjectMapper();
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -253,7 +255,12 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     private JsonNode readFile(File file) throws IOException {
         String fileName = file.getName().toLowerCase(Locale.ROOT);
         if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) {
-            return yamlMapper.readTree(file);
+            Yaml snakeYaml = new Yaml();
+            Object loadedYaml;
+            try (InputStream in = Files.newInputStream(file.toPath())) {
+                loadedYaml = snakeYaml.load(in);
+            }
+            return yamlMapper.valueToTree(loadedYaml);
         } else {
             return jsonMapper.readTree(file);
         }
