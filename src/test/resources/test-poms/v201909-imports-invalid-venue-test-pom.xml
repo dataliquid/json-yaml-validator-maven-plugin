@@ -22,6 +22,7 @@
                     <schemaMappings>
                         <schemaMapping>http://example.com/schemas/v201909/=${basedir}/src/test/resources/schemas/v201909/</schemaMapping>
                     </schemaMappings>
+                    <expectedResult>SUCCESS</expectedResult>
                 </configuration>
             </plugin>
         </plugins>

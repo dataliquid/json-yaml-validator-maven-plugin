@@ -2,7 +2,7 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dataliquid.maven</groupId>
-    <artifactId>v201909-yaml-aliases-test</artifactId>
+    <artifactId>expected-result-success-test</artifactId>
     <version>1.0.0</version>
 
     <build>
@@ -12,16 +12,14 @@
                 <artifactId>json-yaml-validator-maven-plugin</artifactId>
                 <version>@project.version@</version>
                 <configuration>
-                    <schemaFile>${basedir}/src/test/resources/schemas/v201909/event-with-imports.json</schemaFile>
-                    <sourceDirectory>${basedir}/src/test/resources/test-data/v201909/valid</sourceDirectory>
+                    <schemaFile>${basedir}/src/test/resources/schemas/v4/product-schema-v4.json</schemaFile>
+                    <sourceDirectory>${basedir}/src/test/resources/test-data/v4/valid</sourceDirectory>
                     <includes>
-                        <include>event-yaml-aliases.yaml</include>
+                        <include>product-valid.json</include>
                     </includes>
-                    <schemaVersion>V201909</schemaVersion>
+                    <schemaVersion>V4</schemaVersion>
+                    <expectedResult>SUCCESS</expectedResult>
                     <failOnError>true</failOnError>
-                    <schemaMappings>
-                        <schemaMapping>http://example.com/schemas/v201909/=${basedir}/src/test/resources/schemas/v201909/</schemaMapping>
-                    </schemaMappings>
                 </configuration>
             </plugin>
         </plugins>
