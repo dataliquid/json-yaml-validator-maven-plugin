@@ -35,6 +35,7 @@
                     
                     <failOnError>true</failOnError>
                     <schemaVersion>V202012</schemaVersion>
+                    <expectedResult>SUCCESS</expectedResult>
                 </configuration>
                 <executions>
                     <execution>

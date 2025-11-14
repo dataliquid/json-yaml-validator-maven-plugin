@@ -2,9 +2,9 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dataliquid.maven</groupId>
-    <artifactId>v201909-invalid-metadata-test</artifactId>
+    <artifactId>expected-result-success-test</artifactId>
     <version>1.0.0</version>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -12,14 +12,14 @@
                 <artifactId>json-yaml-validator-maven-plugin</artifactId>
                 <version>@project.version@</version>
                 <configuration>
-                    <schemaFile>${basedir}/src/test/resources/schemas/v201909/event-schema-v201909.json</schemaFile>
-                    <sourceDirectory>${basedir}/src/test/resources/test-data/v201909/invalid</sourceDirectory>
+                    <schemaFile>${basedir}/src/test/resources/schemas/v4/product-schema-v4.json</schemaFile>
+                    <sourceDirectory>${basedir}/src/test/resources/test-data/v4/valid</sourceDirectory>
                     <includes>
-                        <include>event-invalid-metadata.yaml</include>
+                        <include>product-valid.json</include>
                     </includes>
-                    <schemaVersion>V201909</schemaVersion>
-                    <failOnError>true</failOnError>
+                    <schemaVersion>V4</schemaVersion>
                     <expectedResult>SUCCESS</expectedResult>
+                    <failOnError>true</failOnError>
                 </configuration>
             </plugin>
         </plugins>

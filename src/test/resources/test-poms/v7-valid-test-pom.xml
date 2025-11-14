@@ -19,6 +19,7 @@
                     </includes>
                     <schemaVersion>V7</schemaVersion>
                     <failOnError>true</failOnError>
+                    <expectedResult>SUCCESS</expectedResult>
                 </configuration>
             </plugin>
         </plugins>
