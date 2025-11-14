@@ -2,6 +2,8 @@ package com.dataliquid.maven.plugin.schema.validator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
@@ -26,7 +28,7 @@ import com.dataliquid.maven.plugin.schema.validator.utils.AntPatternFileFilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.yaml.snakeyaml.Yaml;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
@@ -80,7 +82,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     private boolean strictErrorMatching;
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    private final ObjectMapper yamlMapper = new ObjectMapper();
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -253,7 +255,12 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     private JsonNode readFile(File file) throws IOException {
         String fileName = file.getName().toLowerCase(Locale.ROOT);
         if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) {
-            return yamlMapper.readTree(file);
+            Yaml snakeYaml = new Yaml();
+            Object loadedYaml;
+            try (InputStream in = Files.newInputStream(file.toPath())) {
+                loadedYaml = snakeYaml.load(in);
+            }
+            return yamlMapper.valueToTree(loadedYaml);
         } else {
             return jsonMapper.readTree(file);
         }
@@ -384,46 +391,6 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     }
 
     /**
-     * Result of matching expected errors against actual errors.
-     */
-    private static class ErrorMatchingResult {
-        private final Set<String> matchedPatterns;
-        private final Set<String> unmatchedPatterns;
-        private final Set<String> unexpectedErrors;
-
-        public ErrorMatchingResult(Set<String> matchedPatterns, Set<String> unmatchedPatterns,
-                Set<String> unexpectedErrors) {
-            this.matchedPatterns = matchedPatterns;
-            this.unmatchedPatterns = unmatchedPatterns;
-            this.unexpectedErrors = unexpectedErrors;
-        }
-
-        public Set<String> getMatchedPatterns() {
-            return matchedPatterns;
-        }
-
-        public Set<String> getUnmatchedPatterns() {
-            return unmatchedPatterns;
-        }
-
-        public Set<String> getUnexpectedErrors() {
-            return unexpectedErrors;
-        }
-
-        public boolean hasUnmatchedPatterns() {
-            return !unmatchedPatterns.isEmpty();
-        }
-
-        public boolean hasUnexpectedErrors() {
-            return !unexpectedErrors.isEmpty();
-        }
-
-        public boolean isFullMatch() {
-            return !hasUnmatchedPatterns() && !hasUnexpectedErrors();
-        }
-    }
-
-    /**
      * Matches actual validation errors against expected error patterns.
      *
      * @param  results The validation results containing actual errors
@@ -473,40 +440,6 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
             return file;
         } else {
             return new File(parentDir, path);
-        }
-    }
-
-    private static class ValidationResult {
-        private final File file;
-        private final Set<ValidationMessage> errors;
-        private final Exception exception;
-
-        public ValidationResult(File file, Set<ValidationMessage> errors) {
-            this.file = file;
-            this.errors = errors;
-            this.exception = null;
-        }
-
-        public ValidationResult(File file, Exception exception) {
-            this.file = file;
-            this.errors = null;
-            this.exception = exception;
-        }
-
-        public boolean isValid() {
-            return (errors == null || errors.isEmpty()) && exception == null;
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        public Set<ValidationMessage> getErrors() {
-            return errors;
-        }
-
-        public Exception getException() {
-            return exception;
         }
     }
 }
