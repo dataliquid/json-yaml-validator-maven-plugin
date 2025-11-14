@@ -2,16 +2,16 @@ package com.dataliquid.maven.plugin.schema.validator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -28,7 +28,7 @@ import com.dataliquid.maven.plugin.schema.validator.utils.AntPatternFileFilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.yaml.snakeyaml.Yaml;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
@@ -36,6 +36,14 @@ import com.networknt.schema.ValidationMessage;
 
 @Mojo(name = "validate", defaultPhase = LifecyclePhase.VALIDATE)
 public class JsonYamlValidatorMojo extends AbstractMojo {
+
+    /**
+     * Expected result of the validation. Use SUCCESS for positive tests (expect
+     * valid files) and ERROR for negative tests (expect validation errors).
+     */
+    public enum ExpectedResult {
+        SUCCESS, ERROR
+    }
 
     @Parameter(property = "schema.validator.schemaFile", required = true)
     private File schemaFile;
@@ -64,8 +72,17 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     @Parameter(property = "schema.validator.failOnNoFilesFound", defaultValue = "true")
     private boolean failOnNoFilesFound;
 
+    @Parameter(property = "schema.validator.expectedResult", defaultValue = "SUCCESS")
+    private String expectedResult;
+
+    @Parameter(property = "schema.validator.expectedErrors")
+    private String[] expectedErrors;
+
+    @Parameter(property = "schema.validator.strictErrorMatching", defaultValue = "false")
+    private boolean strictErrorMatching;
+
     private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    private final ObjectMapper yamlMapper = new ObjectMapper();
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -80,158 +97,155 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
             throw new MojoExecutionException("Schema file not found: " + schemaFile.getAbsolutePath());
         }
 
+        ExpectedResult expected = ExpectedResult.valueOf(expectedResult.toUpperCase(Locale.ROOT));
+
         try {
             JsonSchema schema = loadSchema();
             List<ValidationResult> results = validateFiles(schema);
-            
+
             reportResults(results);
-            
-            if (failOnError && hasErrors(results)) {
-                throw new MojoFailureException("Validation failed. See errors above.");
-            }
+
+            boolean hasErrors = hasErrors(results);
+
+            handleExpectedResult(expected, hasErrors, results);
         } catch (IOException e) {
             throw new MojoExecutionException("Error during validation", e);
         }
     }
 
     private JsonSchema loadSchema() throws IOException, MojoExecutionException {
-        getLog().info("Loading schema from: " + schemaFile.getAbsolutePath());
-        
+        if (getLog().isInfoEnabled()) {
+            getLog().info("Loading schema from: " + schemaFile.getAbsolutePath());
+        }
+
         JsonNode schemaNode = readFile(schemaFile);
         SpecVersion.VersionFlag version = getSchemaVersion();
-        
+
         JsonSchemaFactory factory;
-        
-        // If schema mappings are configured, create factory with custom schema mappers
+
         if (schemaMappings != null && schemaMappings.length > 0) {
-            // Collect prefix mappings and direct mappings separately
-            Map<String, String> directMappings = new HashMap<>();
-            
-            factory = JsonSchemaFactory.getInstance(version, builder -> 
-                builder.schemaMappers(schemaMappers -> {
-                    // Add mappings from configuration
-                    for (String mapping : schemaMappings) {
-                        String[] parts = mapping.split("=", 2);
-                        if (parts.length == 2) {
-                            String schemaId = parts[0].trim();
-                            String localPath = parts[1].trim();
-                            
-                            // Convert local file path to proper URI
-                            String mappedUri;
-                            if (localPath.startsWith("classpath:") || localPath.startsWith("http://") || 
-                                localPath.startsWith("https://") || localPath.startsWith("file:")) {
-                                // Already a proper URI scheme
-                                mappedUri = localPath;
-                            } else {
-                                // Convert file path to proper file URI
-                                File localFile = new File(localPath);
-                                if (!localFile.isAbsolute()) {
-                                    // Make relative paths relative to schema directory
-                                    localFile = new File(schemaFile.getParentFile(), localPath);
-                                }
-                                mappedUri = localFile.toURI().toString();
-                            }
-                            
-                            // Check if this is a prefix mapping (ends with /) or a direct mapping
-                            if (schemaId.endsWith("/") && localPath.endsWith("/")) {
-                                // This is a prefix mapping for a directory
+            Map<String, String> directMappings = new ConcurrentHashMap<>();
+
+            factory = JsonSchemaFactory.getInstance(version, builder -> builder.schemaMappers(schemaMappers -> {
+                final int MAPPING_PARTS_EXPECTED = 2;
+                for (String mapping : schemaMappings) {
+                    String[] parts = mapping.split("=", MAPPING_PARTS_EXPECTED);
+                    if (parts.length == MAPPING_PARTS_EXPECTED) {
+                        String schemaId = parts[0].trim();
+                        String localPath = parts[1].trim();
+
+                        String mappedUri;
+                        if (localPath.startsWith("classpath:") || localPath.startsWith("http://")
+                                || localPath.startsWith("https://") || localPath.startsWith("file:")) {
+                            mappedUri = localPath;
+                        } else {
+                            File localFile = resolveFile(localPath, schemaFile.getParentFile());
+                            mappedUri = localFile.toURI().toString();
+                        }
+
+                        if (schemaId.endsWith("/") && localPath.endsWith("/")) {
+                            if (getLog().isInfoEnabled()) {
                                 getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
-                                schemaMappers.mapPrefix(schemaId, mappedUri);
-                            } else if (schemaId.endsWith("/") && !localPath.endsWith("/")) {
-                                // Schema ID is a prefix but local path is a directory - ensure it ends with /
-                                File dir = new File(localPath);
-                                if (!dir.isAbsolute()) {
-                                    dir = new File(schemaFile.getParentFile(), localPath);
-                                }
-                                if (dir.isDirectory()) {
-                                    mappedUri = dir.toURI().toString();
+                            }
+                            schemaMappers.mapPrefix(schemaId, mappedUri);
+                        } else if (schemaId.endsWith("/") && !localPath.endsWith("/")) {
+                            File dir = resolveFile(localPath, schemaFile.getParentFile());
+                            if (dir.isDirectory()) {
+                                mappedUri = dir.toURI().toString();
+                                if (getLog().isInfoEnabled()) {
                                     getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
-                                    schemaMappers.mapPrefix(schemaId, mappedUri);
-                                } else {
+                                }
+                                schemaMappers.mapPrefix(schemaId, mappedUri);
+                            } else {
+                                if (getLog().isWarnEnabled()) {
                                     getLog().warn("Schema prefix mapping points to non-directory: " + localPath);
                                 }
-                            } else {
-                                // This is a direct schema mapping - add to map
-                                getLog().info("Adding direct schema mapping: " + schemaId + " -> " + mappedUri);
-                                directMappings.put(schemaId, mappedUri);
                             }
                         } else {
+                            if (getLog().isInfoEnabled()) {
+                                getLog().info("Adding direct schema mapping: " + schemaId + " -> " + mappedUri);
+                            }
+                            directMappings.put(schemaId, mappedUri);
+                        }
+                    } else {
+                        if (getLog().isWarnEnabled()) {
                             getLog().warn("Invalid schema mapping format: " + mapping + " (expected: schemaId=path)");
                         }
                     }
-                    
-                    // Apply all direct mappings at once
-                    if (!directMappings.isEmpty()) {
-                        schemaMappers.mappings(directMappings);
-                    }
-                })
-            );
+                }
+
+                if (!directMappings.isEmpty()) {
+                    schemaMappers.mappings(directMappings);
+                }
+            }));
         } else {
             factory = JsonSchemaFactory.getInstance(version);
         }
-        
-        // Set the schema URI to enable proper resolution of relative $ref imports
+
         return factory.getSchema(schemaFile.toURI(), schemaNode);
     }
 
     private SpecVersion.VersionFlag getSchemaVersion() throws MojoExecutionException {
-        switch (schemaVersion.toUpperCase()) {
-            case "V4":
-                return SpecVersion.VersionFlag.V4;
-            case "V6":
-                return SpecVersion.VersionFlag.V6;
-            case "V7":
-                return SpecVersion.VersionFlag.V7;
-            case "V201909":
-                return SpecVersion.VersionFlag.V201909;
-            case "V202012":
-                return SpecVersion.VersionFlag.V202012;
-            default:
-                throw new MojoExecutionException("Unsupported schema version: " + schemaVersion);
+        switch (schemaVersion.toUpperCase(Locale.ROOT)) {
+        case "V4":
+            return SpecVersion.VersionFlag.V4;
+        case "V6":
+            return SpecVersion.VersionFlag.V6;
+        case "V7":
+            return SpecVersion.VersionFlag.V7;
+        case "V201909":
+            return SpecVersion.VersionFlag.V201909;
+        case "V202012":
+            return SpecVersion.VersionFlag.V202012;
+        default:
+            throw new MojoExecutionException("Unsupported schema version: " + schemaVersion);
         }
     }
 
     private List<ValidationResult> validateFiles(JsonSchema schema) throws IOException, MojoFailureException {
         List<ValidationResult> results = new ArrayList<>();
         List<File> filesToValidate = findFilesToValidate();
-        
-        getLog().info("Found " + filesToValidate.size() + " files to validate");
-        
+
+        if (getLog().isInfoEnabled()) {
+            getLog().info("Found " + filesToValidate.size() + " files to validate");
+        }
+
         if (filesToValidate.isEmpty() && failOnNoFilesFound) {
             getLog().debug("failOnNoFilesFound is true and no files found - throwing exception");
-            throw new MojoFailureException("No files found matching the include patterns. " +
-                "Check your configuration or set failOnNoFilesFound=false to ignore this error.");
+            throw new MojoFailureException("No files found matching the include patterns. "
+                    + "Check your configuration or set failOnNoFilesFound=false to ignore this error.");
         }
-        
+
         for (File file : filesToValidate) {
             results.add(validateFile(file, schema));
         }
-        
+
         return results;
     }
 
     private List<File> findFilesToValidate() throws IOException {
         if (!sourceDirectory.exists()) {
-            getLog().warn("Source directory does not exist: " + sourceDirectory.getAbsolutePath());
+            if (getLog().isWarnEnabled()) {
+                getLog().warn("Source directory does not exist: " + sourceDirectory.getAbsolutePath());
+            }
             return new ArrayList<>();
         }
 
-        // Create a custom file filter that handles Ant-style patterns
         IOFileFilter fileFilter = new AntPatternFileFilter(sourceDirectory, includes, excludes);
-        
-        // Use Apache Commons IO to find files
         Collection<File> files = FileUtils.listFiles(sourceDirectory, fileFilter, TrueFileFilter.INSTANCE);
-        
+
         return new ArrayList<>(files);
     }
 
     private ValidationResult validateFile(File file, JsonSchema schema) {
-        getLog().debug("Validating: " + file.getAbsolutePath());
-        
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Validating: " + file.getAbsolutePath());
+        }
+
         try {
             JsonNode content = readFile(file);
             Set<ValidationMessage> errors = schema.validate(content);
-            
+
             return new ValidationResult(file, errors);
         } catch (Exception e) {
             return new ValidationResult(file, e);
@@ -239,9 +253,14 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     }
 
     private JsonNode readFile(File file) throws IOException {
-        String fileName = file.getName().toLowerCase();
+        String fileName = file.getName().toLowerCase(Locale.ROOT);
         if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) {
-            return yamlMapper.readTree(file);
+            Yaml snakeYaml = new Yaml();
+            Object loadedYaml;
+            try (InputStream in = Files.newInputStream(file.toPath())) {
+                loadedYaml = snakeYaml.load(in);
+            }
+            return yamlMapper.valueToTree(loadedYaml);
         } else {
             return jsonMapper.readTree(file);
         }
@@ -250,23 +269,32 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     private void reportResults(List<ValidationResult> results) {
         int totalFiles = results.size();
         int failedFiles = (int) results.stream().filter(r -> !r.isValid()).count();
-        
-        getLog().info(String.format("Validation complete: %d files processed, %d failed", 
-            totalFiles, failedFiles));
-        
+
+        if (getLog().isInfoEnabled()) {
+            getLog().info(String.format("Validation complete: %d files processed, %d failed", totalFiles, failedFiles));
+        }
+
         for (ValidationResult result : results) {
             if (!result.isValid()) {
-                getLog().error("Validation failed for: " + result.getFile().getAbsolutePath());
-                
+                if (getLog().isErrorEnabled()) {
+                    getLog().error("Validation failed for: " + result.getFile().getAbsolutePath());
+                }
+
                 if (result.getException() != null) {
-                    getLog().error("  Error: " + result.getException().getMessage());
+                    if (getLog().isErrorEnabled()) {
+                        getLog().error("  Error: " + result.getException().getMessage());
+                    }
                 } else {
                     for (ValidationMessage error : result.getErrors()) {
-                        getLog().error("  - " + error.getMessage());
+                        if (getLog().isErrorEnabled()) {
+                            getLog().error("  - " + error.getMessage());
+                        }
                     }
                 }
             } else {
-                getLog().debug("Validation passed for: " + result.getFile().getAbsolutePath());
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Validation passed for: " + result.getFile().getAbsolutePath());
+                }
             }
         }
     }
@@ -275,37 +303,143 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         return results.stream().anyMatch(r -> !r.isValid());
     }
 
-    private static class ValidationResult {
-        private final File file;
-        private final Set<ValidationMessage> errors;
-        private final Exception exception;
+    private void handleExpectedResult(ExpectedResult expected, boolean hasErrors, List<ValidationResult> results)
+            throws MojoFailureException {
+        if (expected == ExpectedResult.SUCCESS) {
+            handleExpectedSuccess(hasErrors);
+        } else {
+            handleExpectedError(hasErrors, results);
+        }
+    }
 
-        public ValidationResult(File file, Set<ValidationMessage> errors) {
-            this.file = file;
-            this.errors = errors;
-            this.exception = null;
+    private void handleExpectedSuccess(boolean hasErrors) throws MojoFailureException {
+        if (hasErrors && failOnError) {
+            throw new MojoFailureException("Validation failed. See errors above.");
+        }
+    }
+
+    private void handleExpectedError(boolean hasErrors, List<ValidationResult> results) throws MojoFailureException {
+        if (!hasErrors) {
+            handleNoErrorsFound();
+        } else if (expectedErrors != null && expectedErrors.length > 0) {
+            handleExpectedErrorPatterns(results);
+        } else {
+            getLog().info("Validation errors found as expected - negative test passed.");
+        }
+    }
+
+    private void handleNoErrorsFound() throws MojoFailureException {
+        if (failOnError) {
+            throw new MojoFailureException("Expected validation errors but all files were valid. "
+                    + "This indicates the negative test failed - " + "invalid input was not detected as invalid.");
+        } else {
+            getLog().warn("Expected validation errors but all files were valid.");
+        }
+    }
+
+    private void handleExpectedErrorPatterns(List<ValidationResult> results) throws MojoFailureException {
+        ErrorMatchingResult matchResult = matchExpectedErrors(results);
+        reportMatchingResults(matchResult);
+        validateMatchingResults(matchResult);
+    }
+
+    private void reportMatchingResults(ErrorMatchingResult matchResult) {
+        if (getLog().isInfoEnabled()) {
+            for (String pattern : matchResult.getMatchedPatterns()) {
+                getLog().info("  \u2713 Expected error matched: " + pattern);
+            }
         }
 
-        public ValidationResult(File file, Exception exception) {
-            this.file = file;
-            this.errors = null;
-            this.exception = exception;
+        if (matchResult.hasUnmatchedPatterns()) {
+            if (getLog().isErrorEnabled()) {
+                for (String pattern : matchResult.getUnmatchedPatterns()) {
+                    getLog().error("  \u2717 Expected error not found: " + pattern);
+                }
+            }
         }
 
-        public boolean isValid() {
-            return (errors == null || errors.isEmpty()) && exception == null;
+        if (matchResult.hasUnexpectedErrors()) {
+            for (String error : matchResult.getUnexpectedErrors()) {
+                if (strictErrorMatching) {
+                    if (getLog().isErrorEnabled()) {
+                        getLog().error("  ! Unexpected error: " + error);
+                    }
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn("  ! Unexpected error: " + error);
+                    }
+                }
+            }
+        }
+    }
+
+    private void validateMatchingResults(ErrorMatchingResult matchResult) throws MojoFailureException {
+        if (matchResult.hasUnmatchedPatterns()) {
+            throw new MojoFailureException("Expected error patterns were not found. See unmatched patterns above.");
         }
 
-        public File getFile() {
+        if (strictErrorMatching && matchResult.hasUnexpectedErrors()) {
+            throw new MojoFailureException("Unexpected validation errors found with strictErrorMatching=true. "
+                    + "See unexpected errors above.");
+        }
+
+        if (matchResult.isFullMatch()) {
+            getLog().info("All expected errors matched - negative test passed.");
+        } else if (!strictErrorMatching) {
+            getLog().info("Expected errors matched - negative test passed (with additional errors).");
+        }
+    }
+
+    /**
+     * Matches actual validation errors against expected error patterns.
+     *
+     * @param  results The validation results containing actual errors
+     *
+     * @return         The matching result
+     */
+    private ErrorMatchingResult matchExpectedErrors(List<ValidationResult> results) {
+        Set<String> matchedPatterns = new HashSet<>();
+        Set<String> unmatchedPatterns = new HashSet<>();
+        Set<String> unexpectedErrors = new HashSet<>();
+
+        Set<String> actualErrors = new HashSet<>();
+        for (ValidationResult result : results) {
+            if (result.getErrors() != null) {
+                for (ValidationMessage error : result.getErrors()) {
+                    actualErrors.add(error.getMessage());
+                }
+            }
+        }
+
+        for (String errorMsg : actualErrors) {
+            boolean matched = false;
+            for (String pattern : expectedErrors) {
+                if (errorMsg.matches(pattern)) {
+                    matchedPatterns.add(pattern);
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) {
+                unexpectedErrors.add(errorMsg);
+            }
+        }
+
+        for (String pattern : expectedErrors) {
+            if (!matchedPatterns.contains(pattern)) {
+                unmatchedPatterns.add(pattern);
+            }
+        }
+
+        return new ErrorMatchingResult(matchedPatterns, unmatchedPatterns, unexpectedErrors);
+    }
+
+    private File resolveFile(String path, File parentDir) {
+        File file = new File(path);
+        if (file.isAbsolute()) {
             return file;
-        }
-
-        public Set<ValidationMessage> getErrors() {
-            return errors;
-        }
-
-        public Exception getException() {
-            return exception;
+        } else {
+            return new File(parentDir, path);
         }
     }
 }

@@ -16,7 +16,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -28,7 +28,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception
         mojo.execute();
     }
@@ -40,7 +40,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid authentication config");
@@ -57,7 +57,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to multiple validation errors");
@@ -75,7 +75,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Valid config without extra properties
         mojo.execute();
     }
@@ -88,7 +88,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // First item in limits array has special constraints
         mojo.execute();
     }
@@ -100,7 +100,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         // Should execute without exception - tests schema importing with $defs
         mojo.execute();
     }
@@ -112,7 +112,7 @@ public class JsonYamlValidatorMojoV202012Test extends AbstractMojoTestCase {
 
         JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
         assertNotNull(mojo);
-        
+
         try {
             mojo.execute();
             fail("Expected MojoFailureException due to invalid data against imported schema definitions");
