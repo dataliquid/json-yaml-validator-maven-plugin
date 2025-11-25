@@ -61,6 +61,9 @@ Add the plugin to your project's `pom.xml`:
 | `skip` | Skip validation execution | `false` | No |
 | `schemaMappings` | Map schema IDs to local files/directories for $ref resolution | - | No |
 | `failOnNoFilesFound` | Fail build when no files match the include patterns | `true` | No |
+| `expectedResult` | Expected validation result: `SUCCESS` or `ERROR` | `SUCCESS` | No |
+| `expectedErrors` | Array of regex patterns for expected validation errors | - | No |
+| `strictErrorMatching` | Fail if unexpected errors occur (when using `expectedErrors`) | `false` | No |
 
 ## File Pattern Matching
 

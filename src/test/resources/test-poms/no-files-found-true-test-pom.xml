@@ -13,6 +13,7 @@
                     </includes>
                     <schemaVersion>V4</schemaVersion>
                     <failOnNoFilesFound>true</failOnNoFilesFound>
+                <expectedResult>SUCCESS</expectedResult>
                 </configuration>
             </plugin>
         </plugins>
