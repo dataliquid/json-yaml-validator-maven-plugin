@@ -20,7 +20,7 @@
                     <schemaVersion>V4</schemaVersion>
                     <expectedResult>ERROR</expectedResult>
                     <expectedErrors>
-                        <error>.*price.*minimum.*</error>
+                        <error>.*minimum.*value.*0.*</error>
                     </expectedErrors>
                     <strictErrorMatching>true</strictErrorMatching>
                     <failOnError>true</failOnError>

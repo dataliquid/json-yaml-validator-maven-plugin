@@ -1,19 +1,19 @@
 package com.dataliquid.maven.plugin.schema.validator;
 
 import java.io.File;
-import java.util.Set;
+import java.util.List;
 
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 
 /**
  * Result of validating a single file against a JSON schema.
  */
 class ValidationResult {
     private final File file;
-    private final Set<ValidationMessage> errors;
+    private final List<Error> errors;
     private final Exception exception;
 
-    public ValidationResult(File file, Set<ValidationMessage> errors) {
+    public ValidationResult(File file, List<Error> errors) {
         this.file = file;
         this.errors = errors;
         this.exception = null;
@@ -33,7 +33,7 @@ class ValidationResult {
         return file;
     }
 
-    public Set<ValidationMessage> getErrors() {
+    public List<Error> getErrors() {
         return errors;
     }
 
