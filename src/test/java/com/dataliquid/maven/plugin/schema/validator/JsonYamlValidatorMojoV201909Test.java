@@ -138,4 +138,18 @@ public class JsonYamlValidatorMojoV201909Test extends AbstractMojoTestCase {
             assertTrue(e.getMessage().contains("Validation failed"));
         }
     }
+
+    public void testV201909ValidEventWithYamlAliases() throws Exception {
+        File pom = getTestFile("target/test-classes/test-poms/v201909-yaml-aliases-test-pom.xml");
+        assertNotNull(pom);
+        assertTrue(pom.exists());
+
+        JsonYamlValidatorMojo mojo = (JsonYamlValidatorMojo) lookupMojo("validate", pom);
+        assertNotNull(mojo);
+
+        // Should execute without exception - tests YAML anchors and aliases
+        // This specifically tests that YAML aliases are resolved to their actual values
+        // and not treated as strings (Issue #52)
+        mojo.execute();
+    }
 }
