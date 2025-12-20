@@ -26,8 +26,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import com.dataliquid.maven.plugin.schema.validator.utils.AntPatternFileFilter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import org.yaml.snakeyaml.Yaml;
 import com.networknt.schema.Error;
 import com.networknt.schema.Schema;
@@ -83,8 +83,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     @Parameter(property = "schema.validator.strictErrorMatching", defaultValue = "false")
     private boolean strictErrorMatching;
 
-    private final ObjectMapper jsonMapper = new ObjectMapper();
-    private final ObjectMapper yamlMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -261,12 +260,13 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     private JsonNode readFile(File file) throws IOException {
         String fileName = file.getName().toLowerCase(Locale.ROOT);
         if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) {
+            // Use SnakeYAML for proper YAML merge key (<<) resolution
             Yaml snakeYaml = new Yaml();
             Object loadedYaml;
             try (InputStream in = Files.newInputStream(file.toPath())) {
                 loadedYaml = snakeYaml.load(in);
             }
-            return yamlMapper.valueToTree(loadedYaml);
+            return jsonMapper.valueToTree(loadedYaml);
         } else {
             return jsonMapper.readTree(file);
         }
