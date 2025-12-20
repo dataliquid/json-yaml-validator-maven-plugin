@@ -55,19 +55,11 @@
             <version>${json-schema-validator.version}</version>
         </dependency>
 
-        <!-- Jackson 3 for JSON/YAML parsing -->
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>3.0.3</version>
         </dependency>
-        <dependency>
-            <groupId>tools.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-
-        <!-- SnakeYAML for proper YAML merge key (<<) resolution -->
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
