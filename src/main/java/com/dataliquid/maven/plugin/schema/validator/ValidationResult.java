@@ -8,21 +8,14 @@ import com.networknt.schema.Error;
 /**
  * Result of validating a single file against a JSON schema.
  */
-class ValidationResult {
-    private final File file;
-    private final List<Error> errors;
-    private final Exception exception;
+record ValidationResult(File file, List<Error> errors, Exception exception) {
 
     public ValidationResult(File file, List<Error> errors) {
-        this.file = file;
-        this.errors = errors;
-        this.exception = null;
+        this(file, errors, null);
     }
 
     public ValidationResult(File file, Exception exception) {
-        this.file = file;
-        this.errors = null;
-        this.exception = exception;
+        this(file, null, exception);
     }
 
     public boolean isValid() {

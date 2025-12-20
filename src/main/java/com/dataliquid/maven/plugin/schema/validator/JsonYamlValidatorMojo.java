@@ -198,20 +198,14 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     }
 
     private SpecificationVersion getSchemaVersion() throws MojoExecutionException {
-        switch (schemaVersion.toUpperCase(Locale.ROOT)) {
-        case "V4":
-            return SpecificationVersion.DRAFT_4;
-        case "V6":
-            return SpecificationVersion.DRAFT_6;
-        case "V7":
-            return SpecificationVersion.DRAFT_7;
-        case "V201909":
-            return SpecificationVersion.DRAFT_2019_09;
-        case "V202012":
-            return SpecificationVersion.DRAFT_2020_12;
-        default:
-            throw new MojoExecutionException("Unsupported schema version: " + schemaVersion);
-        }
+        return switch (schemaVersion.toUpperCase(Locale.ROOT)) {
+        case "V4" -> SpecificationVersion.DRAFT_4;
+        case "V6" -> SpecificationVersion.DRAFT_6;
+        case "V7" -> SpecificationVersion.DRAFT_7;
+        case "V201909" -> SpecificationVersion.DRAFT_2019_09;
+        case "V202012" -> SpecificationVersion.DRAFT_2020_12;
+        default -> throw new MojoExecutionException("Unsupported schema version: " + schemaVersion);
+        };
     }
 
     private List<ValidationResult> validateFiles(Schema schema) throws IOException, MojoFailureException {
