@@ -7,8 +7,8 @@ A Maven plugin for validating JSON and YAML files against a JSON Schema using th
 
 ## Requirements
 
-- Java 11 or higher
-- Maven 3.6.0 or higher
+- Java 17 or higher
+- Maven 3.9 or higher
 
 ## Features
 
@@ -28,7 +28,7 @@ Add the plugin to your project's `pom.xml`:
         <plugin>
             <groupId>com.dataliquid.maven</groupId>
             <artifactId>json-yaml-validator-maven-plugin</artifactId>
-            <version>1.0.0</version>
+            <version>2.0.0</version>
             <executions>
                 <execution>
                     <id>validate-json-yaml</id>
@@ -161,14 +161,14 @@ Here's a complete example POM file showing how to configure the plugin:
 
     <groupId>com.dataliquid.maven</groupId>
     <artifactId>example-project</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>com.dataliquid.maven</groupId>
                 <artifactId>json-yaml-validator-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>2.0.0</version>
                 <executions>
                     <execution>
                         <id>validate-json-yaml</id>
