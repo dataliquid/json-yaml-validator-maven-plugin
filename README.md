@@ -8,7 +8,7 @@ A Maven plugin for validating JSON and YAML files against a JSON Schema using th
 ## Requirements
 
 - Java 17 or higher
-- Maven 3.6.0 or higher
+- Maven 3.9 or higher
 
 ## Features
 
