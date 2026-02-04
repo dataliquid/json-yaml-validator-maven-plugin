@@ -26,6 +26,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import com.dataliquid.maven.plugin.schema.validator.utils.AntPatternFileFilter;
 
+import org.apache.maven.shared.utils.StringUtils;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import org.yaml.snakeyaml.Yaml;
@@ -293,7 +294,11 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
                 } else {
                     for (Error error : result.getErrors()) {
                         if (getLog().isErrorEnabled()) {
-                            getLog().error("  - " + error.getMessage());
+                            String nodePath = (error.getInstanceLocation() != null
+                                    && StringUtils.isNotBlank(error.getInstanceLocation().toString()))
+                                            ? error.getInstanceLocation().toString() + ": "
+                                            : "";
+                            getLog().error("  - " + nodePath + error.getMessage());
                         }
                     }
                 }
