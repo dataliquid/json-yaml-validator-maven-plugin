@@ -5,17 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,8 +20,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import com.dataliquid.maven.plugin.schema.validator.utils.AntPatternFileFilter;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -45,6 +41,13 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
      */
     public enum ExpectedResult {
         SUCCESS, ERROR
+    }
+
+    /**
+     * A parsed schema mapping entry: maps a schema ID (or ID prefix) to a local or
+     * remote URI.
+     */
+    private record SchemaMapping(String schemaId, String uri, boolean prefix) {
     }
 
     @Parameter(property = "schema.validator.schemaFile", required = true)
@@ -98,8 +101,8 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
             throw new MojoExecutionException("Schema file not found: " + schemaFile.getAbsolutePath());
         }
 
-        String expectedResultValue = expectedResult != null ? expectedResult : "SUCCESS";
-        ExpectedResult expected = ExpectedResult.valueOf(expectedResultValue.toUpperCase(Locale.ROOT));
+        ExpectedResult expected = getExpectedResult();
+        validateExpectedErrorPatterns();
 
         try {
             Schema schema = loadSchema();
@@ -107,11 +110,32 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
 
             reportResults(results);
 
-            boolean hasErrors = hasErrors(results);
-
-            handleExpectedResult(expected, hasErrors, results);
+            handleExpectedResult(expected, hasErrors(results), results);
         } catch (IOException e) {
             throw new MojoExecutionException("Error during validation", e);
+        }
+    }
+
+    private ExpectedResult getExpectedResult() throws MojoExecutionException {
+        String value = expectedResult != null ? expectedResult : "SUCCESS";
+        try {
+            return ExpectedResult.valueOf(value.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new MojoExecutionException(
+                    "Unsupported expectedResult: " + expectedResult + " (supported: SUCCESS, ERROR)", e);
+        }
+    }
+
+    private void validateExpectedErrorPatterns() throws MojoExecutionException {
+        if (expectedErrors == null) {
+            return;
+        }
+        for (String pattern : expectedErrors) {
+            try {
+                Pattern.compile(pattern);
+            } catch (PatternSyntaxException e) {
+                throw new MojoExecutionException("Invalid expectedErrors pattern: " + pattern, e);
+            }
         }
     }
 
@@ -126,64 +150,22 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         SchemaRegistry registry;
 
         if (schemaMappings != null && schemaMappings.length > 0) {
-            Map<String, String> directMappings = new ConcurrentHashMap<>();
+            List<SchemaMapping> mappings = parseSchemaMappings();
 
             registry = SchemaRegistry.withDefaultDialect(version, builder -> {
                 // Add IriResourceLoader to load file:// URLs (required for mapped local
                 // schemas)
                 builder.resourceLoaders(rl -> rl.add(IriResourceLoader.getInstance()));
 
-                // Configure schema ID resolvers
                 builder.schemaIdResolvers(schemaIdResolvers -> {
-                    final int MAPPING_PARTS_EXPECTED = 2;
-                    for (String mapping : schemaMappings) {
-                        String[] parts = mapping.split("=", MAPPING_PARTS_EXPECTED);
-                        if (parts.length == MAPPING_PARTS_EXPECTED) {
-                            String schemaId = parts[0].trim();
-                            String localPath = parts[1].trim();
-
-                            String mappedUri;
-                            if (localPath.startsWith("classpath:") || localPath.startsWith("http://")
-                                    || localPath.startsWith("https://") || localPath.startsWith("file:")) {
-                                mappedUri = localPath;
-                            } else {
-                                File localFile = resolveFile(localPath, schemaFile.getParentFile());
-                                mappedUri = localFile.toURI().toString();
-                            }
-
-                            if (schemaId.endsWith("/") && localPath.endsWith("/")) {
-                                if (getLog().isInfoEnabled()) {
-                                    getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
-                                }
-                                schemaIdResolvers.mapPrefix(schemaId, mappedUri);
-                            } else if (schemaId.endsWith("/") && !localPath.endsWith("/")) {
-                                File dir = resolveFile(localPath, schemaFile.getParentFile());
-                                if (dir.isDirectory()) {
-                                    mappedUri = dir.toURI().toString();
-                                    if (getLog().isInfoEnabled()) {
-                                        getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + mappedUri);
-                                    }
-                                    schemaIdResolvers.mapPrefix(schemaId, mappedUri);
-                                } else {
-                                    if (getLog().isWarnEnabled()) {
-                                        getLog().warn("Schema prefix mapping points to non-directory: " + localPath);
-                                    }
-                                }
-                            } else {
-                                if (getLog().isInfoEnabled()) {
-                                    getLog().info("Adding direct schema mapping: " + schemaId + " -> " + mappedUri);
-                                }
-                                directMappings.put(schemaId, mappedUri);
-                            }
+                    Map<String, String> directMappings = new ConcurrentHashMap<>();
+                    for (SchemaMapping mapping : mappings) {
+                        if (mapping.prefix()) {
+                            schemaIdResolvers.mapPrefix(mapping.schemaId(), mapping.uri());
                         } else {
-                            if (getLog().isWarnEnabled()) {
-                                getLog()
-                                        .warn("Invalid schema mapping format: " + mapping
-                                                + " (expected: schemaId=path)");
-                            }
+                            directMappings.put(mapping.schemaId(), mapping.uri());
                         }
                     }
-
                     if (!directMappings.isEmpty()) {
                         schemaIdResolvers.mappings(directMappings);
                     }
@@ -194,6 +176,61 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         }
 
         return registry.getSchema(SchemaLocation.of(schemaFile.toURI().toString()), schemaNode);
+    }
+
+    private List<SchemaMapping> parseSchemaMappings() {
+        final int mappingPartsExpected = 2;
+        List<SchemaMapping> mappings = new ArrayList<>();
+
+        for (String mapping : schemaMappings) {
+            String[] parts = mapping.split("=", mappingPartsExpected);
+            if (parts.length != mappingPartsExpected) {
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn("Invalid schema mapping format: " + mapping + " (expected: schemaId=path)");
+                }
+                continue;
+            }
+
+            String schemaId = parts[0].trim();
+            String localPath = parts[1].trim();
+
+            if (!schemaId.endsWith("/")) {
+                String uri = toMappedUri(localPath);
+                if (getLog().isInfoEnabled()) {
+                    getLog().info("Adding direct schema mapping: " + schemaId + " -> " + uri);
+                }
+                mappings.add(new SchemaMapping(schemaId, uri, false));
+            } else if (localPath.endsWith("/")) {
+                String uri = toMappedUri(localPath);
+                if (getLog().isInfoEnabled()) {
+                    getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + uri);
+                }
+                mappings.add(new SchemaMapping(schemaId, uri, true));
+            } else {
+                File dir = resolveFile(localPath, schemaFile.getParentFile());
+                if (dir.isDirectory()) {
+                    String uri = dir.toURI().toString();
+                    if (getLog().isInfoEnabled()) {
+                        getLog().info("Adding schema prefix mapping: " + schemaId + " -> " + uri);
+                    }
+                    mappings.add(new SchemaMapping(schemaId, uri, true));
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn("Schema prefix mapping points to non-directory: " + localPath);
+                    }
+                }
+            }
+        }
+
+        return mappings;
+    }
+
+    private String toMappedUri(String localPath) {
+        if (localPath.startsWith("classpath:") || localPath.startsWith("http://") || localPath.startsWith("https://")
+                || localPath.startsWith("file:")) {
+            return localPath;
+        }
+        return resolveFile(localPath, schemaFile.getParentFile()).toURI().toString();
     }
 
     private SpecificationVersion getSchemaVersion() throws MojoExecutionException {
@@ -207,7 +244,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         };
     }
 
-    private List<ValidationResult> validateFiles(Schema schema) throws IOException, MojoFailureException {
+    private List<ValidationResult> validateFiles(Schema schema) throws MojoFailureException {
         List<ValidationResult> results = new ArrayList<>();
         List<File> filesToValidate = findFilesToValidate();
 
@@ -228,7 +265,7 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
         return results;
     }
 
-    private List<File> findFilesToValidate() throws IOException {
+    private List<File> findFilesToValidate() {
         if (!sourceDirectory.exists()) {
             if (getLog().isWarnEnabled()) {
                 getLog().warn("Source directory does not exist: " + sourceDirectory.getAbsolutePath());
@@ -236,10 +273,18 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
             return new ArrayList<>();
         }
 
-        IOFileFilter fileFilter = new AntPatternFileFilter(sourceDirectory, includes, excludes);
-        Collection<File> files = FileUtils.listFiles(sourceDirectory, fileFilter, TrueFileFilter.INSTANCE);
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir(sourceDirectory);
+        // null includes must match nothing (DirectoryScanner would match everything)
+        scanner.setIncludes(includes != null ? includes : new String[0]);
+        scanner.setExcludes(excludes);
+        scanner.scan();
 
-        return new ArrayList<>(files);
+        List<File> files = new ArrayList<>();
+        for (String relativePath : scanner.getIncludedFiles()) {
+            files.add(new File(sourceDirectory, relativePath));
+        }
+        return files;
     }
 
     private ValidationResult validateFile(File file, Schema schema) {
@@ -273,33 +318,36 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
     }
 
     private void reportResults(List<ValidationResult> results) {
-        int totalFiles = results.size();
-        int failedFiles = (int) results.stream().filter(r -> !r.isValid()).count();
+        long failedFiles = results.stream().filter(r -> !r.isValid()).count();
 
         if (getLog().isInfoEnabled()) {
-            getLog().info(String.format("Validation complete: %d files processed, %d failed", totalFiles, failedFiles));
+            getLog()
+                    .info(String
+                            .format("Validation complete: %d files processed, %d failed", results.size(), failedFiles));
         }
 
         for (ValidationResult result : results) {
             if (!result.isValid()) {
-                if (getLog().isErrorEnabled()) {
-                    getLog().error("Validation failed for: " + result.getFile().getAbsolutePath());
-                }
+                reportFailedResult(result);
+            } else if (getLog().isDebugEnabled()) {
+                getLog().debug("Validation passed for: " + result.file().getAbsolutePath());
+            }
+        }
+    }
 
-                if (result.getException() != null) {
-                    if (getLog().isErrorEnabled()) {
-                        getLog().error("  Error: " + result.getException().getMessage());
-                    }
-                } else {
-                    for (Error error : result.getErrors()) {
-                        if (getLog().isErrorEnabled()) {
-                            getLog().error("  - " + error.getMessage());
-                        }
-                    }
-                }
-            } else {
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Validation passed for: " + result.getFile().getAbsolutePath());
+    private void reportFailedResult(ValidationResult result) {
+        if (getLog().isErrorEnabled()) {
+            getLog().error("Validation failed for: " + result.file().getAbsolutePath());
+        }
+
+        if (result.exception() != null) {
+            if (getLog().isErrorEnabled()) {
+                getLog().error("  Error: " + result.exception().getMessage());
+            }
+        } else {
+            for (Error error : result.errors()) {
+                if (getLog().isErrorEnabled()) {
+                    getLog().error("  - " + error.getMessage());
                 }
             }
         }
@@ -351,30 +399,24 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
 
     private void reportMatchingResults(ErrorMatchingResult matchResult) {
         if (getLog().isInfoEnabled()) {
-            for (String pattern : matchResult.getMatchedPatterns()) {
+            for (String pattern : matchResult.matchedPatterns()) {
                 getLog().info("  \u2713 Expected error matched: " + pattern);
             }
         }
 
-        if (matchResult.hasUnmatchedPatterns()) {
-            if (getLog().isErrorEnabled()) {
-                for (String pattern : matchResult.getUnmatchedPatterns()) {
-                    getLog().error("  \u2717 Expected error not found: " + pattern);
-                }
+        if (getLog().isErrorEnabled()) {
+            for (String pattern : matchResult.unmatchedPatterns()) {
+                getLog().error("  \u2717 Expected error not found: " + pattern);
             }
         }
 
-        if (matchResult.hasUnexpectedErrors()) {
-            for (String error : matchResult.getUnexpectedErrors()) {
-                if (strictErrorMatching) {
-                    if (getLog().isErrorEnabled()) {
-                        getLog().error("  ! Unexpected error: " + error);
-                    }
-                } else {
-                    if (getLog().isWarnEnabled()) {
-                        getLog().warn("  ! Unexpected error: " + error);
-                    }
+        for (String error : matchResult.unexpectedErrors()) {
+            if (strictErrorMatching) {
+                if (getLog().isErrorEnabled()) {
+                    getLog().error("  ! Unexpected error: " + error);
                 }
+            } else if (getLog().isWarnEnabled()) {
+                getLog().warn("  ! Unexpected error: " + error);
             }
         }
     }
@@ -410,8 +452,8 @@ public class JsonYamlValidatorMojo extends AbstractMojo {
 
         Set<String> actualErrors = new HashSet<>();
         for (ValidationResult result : results) {
-            if (result.getErrors() != null) {
-                for (Error error : result.getErrors()) {
+            if (result.errors() != null) {
+                for (Error error : result.errors()) {
                     actualErrors.add(error.getMessage());
                 }
             }

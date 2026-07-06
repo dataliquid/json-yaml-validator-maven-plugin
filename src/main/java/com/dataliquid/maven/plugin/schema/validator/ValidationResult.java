@@ -10,27 +10,15 @@ import com.networknt.schema.Error;
  */
 record ValidationResult(File file, List<Error> errors, Exception exception) {
 
-    public ValidationResult(File file, List<Error> errors) {
+    ValidationResult(File file, List<Error> errors) {
         this(file, errors, null);
     }
 
-    public ValidationResult(File file, Exception exception) {
+    ValidationResult(File file, Exception exception) {
         this(file, null, exception);
     }
 
     public boolean isValid() {
         return (errors == null || errors.isEmpty()) && exception == null;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public List<Error> getErrors() {
-        return errors;
-    }
-
-    public Exception getException() {
-        return exception;
     }
 }

@@ -18,16 +18,4 @@ record ErrorMatchingResult(Set<String> matchedPatterns, Set<String> unmatchedPat
     public boolean isFullMatch() {
         return !hasUnmatchedPatterns() && !hasUnexpectedErrors();
     }
-
-    public Set<String> getMatchedPatterns() {
-        return matchedPatterns;
-    }
-
-    public Set<String> getUnmatchedPatterns() {
-        return unmatchedPatterns;
-    }
-
-    public Set<String> getUnexpectedErrors() {
-        return unexpectedErrors;
-    }
 }

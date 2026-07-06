@@ -66,11 +66,11 @@
             <version>2.6</version>
         </dependency>
 
-        <!-- Apache Commons IO for file operations -->
+        <!-- Plexus Utils for Ant-style pattern file scanning (same version as Maven ${maven.version}) -->
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.22.0</version>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.5.1</version>
         </dependency>
 
         <!-- SLF4J Simple logging implementation -->
